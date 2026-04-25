@@ -1,0 +1,1876 @@
+[
+  {
+    "type": "bigO",
+    "topic": "python-lists",
+    "difficulty": "easy",
+    "prompt": "What is the average time complexity of appending an element to a Python list?",
+    "code": "my_list.append(10)",
+    "options": ["O(1)", "O(n)", "O(log n)", "O(n^2)"],
+    "answer": 0,
+    "explanation": "Python lists are dynamic arrays; appending is O(1) amortized because they over-allocate space."
+  },
+  {
+    "type": "bigO",
+    "topic": "python-lists",
+    "difficulty": "easy",
+    "prompt": "What is the time complexity of popping the LAST element from a list?",
+    "code": "my_list.pop()",
+    "options": ["O(1)", "O(n)", "O(log n)", "O(k)"],
+    "answer": 0,
+    "explanation": "Removing from the end requires no shifting of elements, making it O(1)."
+  },
+  {
+    "type": "bigO",
+    "topic": "python-lists",
+    "difficulty": "medium",
+    "prompt": "What is the time complexity of popping the FIRST element from a list?",
+    "code": "my_list.pop(0)",
+    "options": ["O(1)", "O(log n)", "O(n)", "O(n^2)"],
+    "answer": 2,
+    "explanation": "Popping from the start requires shifting every other element one position to the left, which is O(n)."
+  },
+  {
+    "type": "bigO",
+    "topic": "python-lists",
+    "difficulty": "medium",
+    "prompt": "What is the complexity of inserting an element at an arbitrary index 'i'?",
+    "code": "my_list.insert(i, 'val')",
+    "options": ["O(1)", "O(n)", "O(n log n)", "O(k)"],
+    "answer": 1,
+    "explanation": "In the worst case (inserting at index 0), you must shift all n elements."
+  },
+  {
+    "type": "bigO",
+    "topic": "python-lists",
+    "difficulty": "medium",
+    "prompt": "What is the complexity of extending a list with 'k' elements?",
+    "code": "list_a.extend(list_b) # len(list_b) = k",
+    "options": ["O(1)", "O(n)", "O(k)", "O(n+k)"],
+    "answer": 2,
+    "explanation": "Complexity is O(k) where k is the number of elements being added."
+  },
+  {
+    "type": "bigO",
+    "topic": "python-lists",
+    "difficulty": "medium",
+    "prompt": "What is the complexity of the 'remove' method in Python?",
+    "code": "my_list.remove(x)",
+    "options": ["O(1)", "O(n)", "O(log n)", "O(n log n)"],
+    "answer": 1,
+    "explanation": "Python must first search for the element (O(n)) and then shift remaining elements."
+  },
+  {
+    "type": "bigO",
+    "topic": "python-lists",
+    "difficulty": "easy",
+    "prompt": "What is the complexity of getting an item by index?",
+    "code": "x = my_list[500]",
+    "options": ["O(1)", "O(n)", "O(log n)", "O(n^2)"],
+    "answer": 0,
+    "explanation": "Arrays/Lists provide random access in constant time."
+  },
+  {
+    "type": "bigO",
+    "topic": "python-lists",
+    "difficulty": "medium",
+    "prompt": "What is the complexity of creating a slice of 'k' elements?",
+    "code": "sub_list = my_list[i:i+k]",
+    "options": ["O(1)", "O(n)", "O(k)", "O(n log n)"],
+    "answer": 2,
+    "explanation": "Slicing requires copying k elements into a new list."
+  },
+  {
+    "type": "bigO",
+    "topic": "python-lists",
+    "difficulty": "hard",
+    "prompt": "What is the average complexity of 'list.sort()' in Python?",
+    "code": "my_list.sort()",
+    "options": ["O(n)", "O(n^2)", "O(n log n)", "O(log n)"],
+    "answer": 2,
+    "explanation": "Python uses Timsort, which has a worst-case and average-case of O(n log n)."
+  },
+  {
+    "type": "bigO",
+    "topic": "python-lists",
+    "difficulty": "medium",
+    "prompt": "What is the complexity of checking membership in a list?",
+    "code": "if x in my_list:",
+    "options": ["O(1)", "O(n)", "O(log n)", "O(n^2)"],
+    "answer": 1,
+    "explanation": "In a list, this requires a linear search through all elements."
+  },
+  {
+    "type": "bigO",
+    "topic": "python-dicts",
+    "difficulty": "easy",
+    "prompt": "What is the average complexity of getting a value from a Dictionary?",
+    "code": "val = my_dict['key']",
+    "options": ["O(1)", "O(n)", "O(log n)", "O(n!)"],
+    "answer": 0,
+    "explanation": "Dictionaries use hash tables, offering constant time access on average."
+  },
+  {
+    "type": "bigO",
+    "topic": "python-dicts",
+    "difficulty": "medium",
+    "prompt": "What is the worst-case complexity of Dictionary operations?",
+    "code": "my_dict['key'] = value",
+    "options": ["O(1)", "O(n)", "O(log n)", "O(n^2)"],
+    "answer": 1,
+    "explanation": "Worst case is O(n) if many keys collide in the same hash bucket."
+  },
+  {
+    "type": "bigO",
+    "topic": "python-dicts",
+    "difficulty": "easy",
+    "prompt": "What is the complexity of deleting a key from a Dictionary?",
+    "code": "del my_dict['key']",
+    "options": ["O(1)", "O(n)", "O(log n)", "O(k)"],
+    "answer": 0,
+    "explanation": "Deletion in a hash table is O(1) on average."
+  },
+  {
+    "type": "bigO",
+    "topic": "python-sets",
+    "difficulty": "easy",
+    "prompt": "What is the average complexity of adding an element to a Set?",
+    "code": "my_set.add(x)",
+    "options": ["O(1)", "O(n)", "O(log n)", "O(n^2)"],
+    "answer": 0,
+    "explanation": "Sets are implemented similarly to Dictionaries (hash tables) and offer O(1) average time."
+  },
+  {
+    "type": "bigO",
+    "topic": "python-sets",
+    "difficulty": "hard",
+    "prompt": "What is the complexity of a Set Intersection (s & t)?",
+    "code": "result = set_s & set_t",
+    "options": ["O(1)", "O(n)", "O(min(len(s), len(t)))", "O(len(s) * len(t))"],
+    "answer": 2,
+    "explanation": "Python iterates over the smaller set and checks membership in the larger one."
+  },
+  {
+    "type": "bigO",
+    "topic": "python-lists",
+    "difficulty": "easy",
+    "prompt": "What is the complexity of getting the length of a list?",
+    "code": "len(my_list)",
+    "options": ["O(1)", "O(n)", "O(log n)", "O(n^2)"],
+    "answer": 0,
+    "explanation": "Python stores the size of the list in the object header, so it doesn't need to count."
+  },
+  {
+    "type": "bigO",
+    "topic": "python-lists",
+    "difficulty": "medium",
+    "prompt": "What is the complexity of 'list.count(x)'?",
+    "code": "my_list.count(10)",
+    "options": ["O(1)", "O(n)", "O(log n)", "O(n^2)"],
+    "answer": 1,
+    "explanation": "Python must iterate through every element to count the occurrences."
+  },
+  {
+    "type": "bigO",
+    "topic": "python-lists",
+    "difficulty": "medium",
+    "prompt": "What is the complexity of 'list.reverse()'?",
+    "code": "my_list.reverse()",
+    "options": ["O(1)", "O(n)", "O(n log n)", "O(log n)"],
+    "answer": 1,
+    "explanation": "Reversing requires swapping elements from both ends, involving O(n) swaps."
+  },
+  {
+    "type": "bigO",
+    "topic": "python-dicts",
+    "difficulty": "medium",
+    "prompt": "What is the complexity of checking if a key is in a Dictionary?",
+    "code": "if 'key' in my_dict:",
+    "options": ["O(1)", "O(n)", "O(log n)", "O(n log n)"],
+    "answer": 0,
+    "explanation": "Hash lookup makes membership tests O(1) on average."
+  },
+  {
+    "type": "bigO",
+    "topic": "python-lists",
+    "difficulty": "easy",
+    "prompt": "What is the complexity of 'list.clear()'?",
+    "code": "my_list.clear()",
+    "options": ["O(1)", "O(n)", "O(log n)", "O(n^2)"],
+    "answer": 1,
+    "explanation": "While it seems fast, it actually has to clear the references for all n elements."
+  },
+  {
+    "type": "bigO",
+    "topic": "trees",
+    "difficulty": "medium",
+    "prompt": "What is the worst-case search complexity for a balanced Binary Search Tree (BST)?",
+    "options": ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+    "answer": 1,
+    "explanation": "In a balanced BST (like AVL or Red-Black), the height is guaranteed to be log n."
+  },
+  {
+    "type": "bigO",
+    "topic": "trees",
+    "difficulty": "hard",
+    "prompt": "What is the worst-case search complexity for a DEGENERATE (unbalanced) Binary Search Tree?",
+    "options": ["O(log n)", "O(n)", "O(n log n)", "O(n^2)"],
+    "answer": 1,
+    "explanation": "If a BST becomes a 'line' (skewed), it effectively becomes a linked list, making search O(n)."
+  },
+  {
+    "type": "bigO",
+    "topic": "trees",
+    "difficulty": "hard",
+    "prompt": "In an AVL Tree, what is the complexity of a single rotation during rebalancing?",
+    "options": ["O(1)", "O(log n)", "O(n)", "O(h)"],
+    "answer": 0,
+    "explanation": "Rotations only involve updating a few pointers, which is a constant time operation."
+  },
+  {
+    "type": "bigO",
+    "topic": "heaps",
+    "difficulty": "easy",
+    "prompt": "What is the time complexity to find the minimum element in a Min-Heap?",
+    "options": ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+    "answer": 0,
+    "explanation": "The minimum element is always at the root (index 0), providing constant time access."
+  },
+  {
+    "type": "bigO",
+    "topic": "heaps",
+    "difficulty": "medium",
+    "prompt": "What is the complexity of inserting a new element into a Binary Heap?",
+    "options": ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+    "answer": 1,
+    "explanation": "Insertion involves adding to the end and 'bubbling up,' which takes time proportional to the height (log n)."
+  },
+  {
+    "type": "bigO",
+    "topic": "heaps",
+    "difficulty": "hard",
+    "prompt": "What is the time complexity of the 'Heapify' algorithm to build a heap from an unordered array?",
+    "options": ["O(log n)", "O(n)", "O(n log n)", "O(n^2)"],
+    "answer": 1,
+    "explanation": "While it looks like n log n, the mathematical sum of heights proves that Build-Heap is linear, O(n)."
+  },
+  {
+    "type": "bigO",
+    "topic": "graphs",
+    "difficulty": "medium",
+    "prompt": "In a graph with V vertices and E edges, what is the complexity of Breadth-First Search (BFS) using an Adjacency List?",
+    "options": ["O(V)", "O(E)", "O(V + E)", "O(V * E)"],
+    "answer": 2,
+    "explanation": "BFS visits every vertex once and checks every edge once."
+  },
+  {
+    "type": "bigO",
+    "topic": "graphs",
+    "difficulty": "hard",
+    "prompt": "What is the complexity of Dijkstra's Algorithm using a Binary Heap?",
+    "options": ["O(V^2)", "O(E log V)", "O(V log E)", "O(E + V)"],
+    "answer": 1,
+    "explanation": "The E log V factor comes from the edge relaxations and heap updates."
+  },
+  {
+    "type": "bigO",
+    "topic": "tries",
+    "difficulty": "medium",
+    "prompt": "What is the time complexity to search for a word of length 'k' in a Trie (Prefix Tree)?",
+    "options": ["O(n)", "O(log n)", "O(k)", "O(2^k)"],
+    "answer": 2,
+    "explanation": "Tries do not depend on the number of words (n), but only the length of the word being searched (k)."
+  },
+  {
+    "type": "bigO",
+    "topic": "sorting",
+    "difficulty": "medium",
+    "prompt": "Which sorting algorithm has a worst-case complexity of O(n^2) despite an average of O(n log n)?",
+    "options": ["Merge Sort", "Heap Sort", "Quick Sort", "Timsort"],
+    "answer": 2,
+    "explanation": "Quick Sort hits O(n^2) if the pivot selection consistently picks the smallest or largest element."
+  },
+  {
+    "type": "bigO",
+    "topic": "sorting",
+    "difficulty": "easy",
+    "prompt": "What is the space complexity of Merge Sort?",
+    "options": ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+    "answer": 2,
+    "explanation": "Merge Sort requires an auxiliary array of size n to merge sub-problems."
+  },
+  {
+    "type": "bigO",
+    "topic": "sorting",
+    "difficulty": "medium",
+    "prompt": "What is the best-case time complexity of Bubble Sort (optimized with a flag)?",
+    "options": ["O(1)", "O(n)", "O(n log n)", "O(n^2)"],
+    "answer": 1,
+    "explanation": "If the array is already sorted, the flag allows it to finish in a single pass."
+  },
+  {
+    "type": "bigO",
+    "topic": "disjoint-set",
+    "difficulty": "hard",
+    "prompt": "What is the complexity of the Union-Find 'Find' operation with Path Compression?",
+    "options": ["O(log n)", "O(1)", "O(α(n))", "O(n)"],
+    "answer": 2,
+    "explanation": "α(n) is the Inverse Ackermann function, which grows so slowly it is nearly constant."
+  },
+  {
+    "type": "bigO",
+    "topic": "hashing",
+    "difficulty": "medium",
+    "prompt": "What is the average time complexity of searching in a Hash Table with a good hash function?",
+    "options": ["O(1)", "O(log n)", "O(n)", "O(k)"],
+    "answer": 0,
+    "explanation": "A good hash function distributes keys evenly, allowing constant time lookup."
+  },
+  {
+    "type": "bigO",
+    "topic": "trees",
+    "difficulty": "hard",
+    "prompt": "What is the worst-case space complexity of a Depth-First Search (DFS) on a tree of height 'h'?",
+    "options": ["O(1)", "O(log n)", "O(h)", "O(n)"],
+    "answer": 2,
+    "explanation": "The recursion stack grows to the height of the tree."
+  },
+  {
+    "type": "bigO",
+    "topic": "arrays",
+    "difficulty": "medium",
+    "prompt": "What is the time complexity of searching an element in a SORTED array using Binary Search?",
+    "options": ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+    "answer": 1,
+    "explanation": "Binary search halves the search space in each step."
+  },
+  {
+    "type": "bigO",
+    "topic": "linked-lists",
+    "difficulty": "medium",
+    "prompt": "What is the complexity of deleting a node in a Singly Linked List if you only have a pointer to that node?",
+    "options": ["O(1)", "O(log n)", "O(n)", "O(1) amortized"],
+    "answer": 0,
+    "explanation": "You can copy the data from the next node into the current node and delete the next node (trick question!)."
+  },
+  {
+    "type": "bigO",
+    "topic": "trees",
+    "difficulty": "medium",
+    "prompt": "What is the complexity of an In-order Traversal of a Binary Tree?",
+    "options": ["O(log n)", "O(n)", "O(n log n)", "O(h)"],
+    "answer": 1,
+    "explanation": "Every node must be visited exactly once."
+  },
+  {
+    "type": "bigO",
+    "topic": "math",
+    "difficulty": "medium",
+    "prompt": "What is the complexity of calculating the Nth Fibonacci number using naive recursion?",
+    "options": ["O(n)", "O(n log n)", "O(2^n)", "O(n^2)"],
+    "answer": 2,
+    "explanation": "Naive recursion recalculates sub-problems, leading to exponential time complexity."
+  },
+  {
+    "type": "bigO",
+    "topic": "math",
+    "difficulty": "medium",
+    "prompt": "What is the complexity of calculating the Nth Fibonacci number using Dynamic Programming (Tabulation)?",
+    "options": ["O(1)", "O(log n)", "O(n)", "O(n^2)"],
+    "answer": 2,
+    "explanation": "By storing previous results, we only iterate through the numbers 1 to n once."
+  },
+{
+"type": "bugspot",
+"topic": "recursion",
+"difficulty": "medium",
+"prompt": "Why will this function cause a RecursionError for n > 0?",
+"code": "def countdown(n):\n    print(n)\n    countdown(n)",
+"options": ["Syntax error", "Missing base case", "Wrong parameter type", "Infinite loop"],
+"answer": 1,
+"explanation": "The function calls itself indefinitely because there is no condition to stop the recursion (e.g., if n == 0)."
+},
+{
+"type": "bugspot",
+"topic": "python-lists",
+"difficulty": "hard",
+"prompt": "Identify the bug in this function designed to clear a list.",
+"code": "def clear_list(items):\n    for item in items:\n        items.remove(item)",
+"options": ["Syntax Error", "It only removes half the items", "It causes a Crash", "No error"],
+"answer": 1,
+"explanation": "Modifying a list while iterating over it skips elements because the internal index shifts forward while items move backward."
+},
+{
+"type": "bugspot",
+"topic": "python-scope",
+"difficulty": "medium",
+"prompt": "What is the issue with using a list as a default argument?",
+"code": "def add_to(val, target=[]):\n    target.append(val)\n    return target",
+"options": ["Syntax Error", "The list is shared across calls", "It only accepts strings", "It returns None"],
+"answer": 1,
+"explanation": "In Python, default arguments are evaluated once at definition. The same list instance is reused for every call."
+},
+{
+"type": "bugspot",
+"topic": "logic",
+"difficulty": "easy",
+"prompt": "What will this code return if input is 0?",
+"code": "def is_positive(n):\n    if n > 0:\n        return True\n    else:\n        return False",
+"options": ["True", "False", "None", "Error"],
+"answer": 1,
+"explanation": "Since 0 is not strictly greater than 0, it falls into the else block."
+},
+{
+"type": "bugspot",
+"topic": "javascript-types",
+"difficulty": "medium",
+"prompt": "In JavaScript, why is this comparison problematic?",
+"code": "if ([] == []) { console.log('Match'); }",
+"options": ["It prints 'Match'", "It throws a Syntax Error", "It is always False", "It is always True"],
+"answer": 2,
+"explanation": "In JS, non-primitive types like arrays are compared by reference, not value. Two different empty arrays occupy different memory slots."
+},
+{
+"type": "bugspot",
+"topic": "python-math",
+"difficulty": "medium",
+"prompt": "Why might this fail in Python 2 but work in Python 3?",
+"code": "def get_half(n):\n    return n / 2",
+"options": ["Syntax change", "Integer division floor", "Memory limit", "No difference"],
+"answer": 1,
+"explanation": "In Python 2, the / operator performs integer division if both numbers are integers (e.g., 5/2 = 2)."
+},
+{
+"type": "bugspot",
+"topic": "looping",
+"difficulty": "medium",
+"prompt": "What happens when this loop runs?",
+"code": "i = 1\nwhile i < 10:\n    if i % 2 == 0:\n        continue\n    print(i)\n    i += 1",
+"options": ["Prints odd numbers", "Prints even numbers", "Infinite loop", "Syntax error"],
+"answer": 2,
+"explanation": "When i is 2, the continue skips the increment (i += 1), so i stays 2 forever."
+},
+{
+"type": "bugspot",
+"topic": "logic",
+"difficulty": "medium",
+"prompt": "What is wrong with this 'search' function?",
+"code": "def find_val(arr, x):\n    for i in arr:\n        if i == x:\n            return True\n        return False",
+"options": ["Always returns True", "Only checks the first element", "Syntax error", "Returns None"],
+"answer": 1,
+"explanation": "The 'return False' is inside the loop. It exits immediately after checking index 0."
+},
+{
+"type": "bugspot",
+"topic": "python-strings",
+"difficulty": "easy",
+"prompt": "Why does this code throw an error?",
+"code": "s = 'Hello'\ns[0] = 'Y'",
+"options": ["Index out of range", "Strings are immutable", "Invalid syntax", "Type mismatch"],
+"answer": 1,
+"explanation": "In Python, you cannot modify a character in a string directly; you must create a new string."
+},
+{
+"type": "bugspot",
+"topic": "binary-search",
+"difficulty": "hard",
+"prompt": "Identify the potential overflow bug in this Java/C++ style code.",
+"code": "int mid = (low + high) / 2;",
+"options": ["Division by zero", "Floating point error", "Integer overflow", "No bug"],
+"answer": 2,
+"explanation": "If low and high are very large, their sum can exceed the maximum integer limit before the division occurs."
+},
+{
+"type": "bugspot",
+"topic": "python-classes",
+"difficulty": "medium",
+"prompt": "What is missing from this class method?",
+"code": "class Dog:\n    def bark():\n        print('Woof!')",
+"options": ["The 'self' parameter", "A constructor", "Return statement", "Parentheses"],
+"answer": 0,
+"explanation": "Instance methods in Python must accept 'self' as the first argument to access the instance."
+},
+{
+"type": "bugspot",
+"topic": "async-js",
+"difficulty": "hard",
+"prompt": "Why will 'result' be undefined in this JS snippet?",
+"code": "let result;\nfetch(url).then(res => {\n    result = res.data;\n});\nconsole.log(result);",
+"options": ["URL is invalid", "Fetch is synchronous", "Console.log runs before fetch finishes", "Scope error"],
+"answer": 2,
+"explanation": "Fetch is asynchronous. The console.log executes before the .then() callback is triggered."
+},
+{
+"type": "bugspot",
+"topic": "python-exceptions",
+"difficulty": "easy",
+"prompt": "What is wrong with this exception handling?",
+"code": "try:\n    x = 1/0\nexcept:\n    pass",
+"options": ["Syntax error", "Catches every error (including interrupts)", "Missing finally block", "It works fine"],
+"answer": 1,
+"explanation": "A bare 'except:' catches everything, including KeyboardInterrupt, making it hard to stop the script."
+},
+{
+"type": "bugspot",
+"topic": "logic",
+"difficulty": "medium",
+"prompt": "What will be the value of 'x'?",
+"code": "x = 10\ndef change():\n    x = 5\nchange()\nprint(x)",
+"options": ["5", "10", "None", "Error"],
+"answer": 1,
+"explanation": "Inside the function, 'x = 5' creates a local variable. The global 'x' remains unchanged."
+},
+{
+"type": "bugspot",
+"topic": "math",
+"difficulty": "easy",
+"prompt": "Why does this return 0.0 instead of 0.5?",
+"code": "double val = 1 / 2;",
+"options": ["Type mismatch", "Integer division happens first", "Floating point error", "Syntax Error"],
+"answer": 1,
+"explanation": "1 and 2 are integers, so integer division results in 0, which is then cast to 0.0."
+},
+{
+"type": "bugspot",
+"topic": "python-iteration",
+"difficulty": "medium",
+"prompt": "What will this code print?",
+"code": "nums = [1, 2, 3]\nfor n in nums:\n    nums.append(n)",
+"options": ["1, 2, 3, 1, 2, 3", "1, 2, 3", "Infinite loop", "Error"],
+"answer": 2,
+"explanation": "Appending to the list while iterating over it expands the list indefinitely, so the loop never ends."
+},
+{
+"type": "bugspot",
+"topic": "logic",
+"difficulty": "medium",
+"prompt": "Find the logical error in this range-check.",
+"code": "if x > 10 or x < 20:",
+"options": ["Syntax error", "It is always True", "It is always False", "It skips 15"],
+"answer": 1,
+"explanation": "Every number is either greater than 10 OR less than 20. It should likely use 'and'."
+},
+{
+"type": "bugspot",
+"topic": "python-dicts",
+"difficulty": "medium",
+"prompt": "Why does this throw a KeyError?",
+"code": "d = {'a': 1}\nprint(d['b'])",
+"options": ["Key 'b' doesn't exist", "Dictionary is empty", "Incorrect syntax", "Wrong type"],
+"answer": 0,
+"explanation": "Accessing a non-existent key with bracket notation raises a KeyError. Use .get() to avoid this."
+},
+{
+"type": "bugspot",
+"topic": "logic",
+"difficulty": "medium",
+"prompt": "What is the issue with this 'maximum' function?",
+"code": "def get_max(arr):\n    m = 0\n    for x in arr:\n        if x > m: m = x\n    return m",
+"options": ["Fails for empty lists", "Fails if all numbers are negative", "Syntax error", "Logic error"],
+"answer": 1,
+"explanation": "If the list is [-5, -10], it will return 0 because 0 was the initial value and is higher than both."
+},
+{
+"type": "bugspot",
+"topic": "python-formatting",
+"difficulty": "easy",
+"prompt": "Why does this print 'x + y' instead of '15'?",
+"code": "x = 5; y = 10\nprint('x + y')",
+"options": ["String literals", "Missing f-string", "Wrong print syntax", "Logic error"],
+"answer": 0,
+"explanation": "The expression is inside quotes, making it a literal string rather than a mathematical calculation."
+},
+{
+"type": "pattern",
+"topic": "arrays",
+"difficulty": "easy",
+"prompt": "Problem: 'Find the maximum sum of a contiguous subarray of size K.' Which pattern is most efficient?",
+"options": ["Dynamic Programming", "Sliding Window", "Binary Search", "Backtracking"],
+"answer": 1,
+"explanation": "A fixed-size sliding window allows you to subtract the exiting element and add the entering element in O(1) time per step."
+},
+{
+"type": "pattern",
+"topic": "strings",
+"difficulty": "medium",
+"prompt": "Problem: 'Given a string, find the length of the longest substring without repeating characters.' Which pattern fits?",
+"options": ["Two Pointers", "Sliding Window", "Stack", "Greedy"],
+"answer": 1,
+"explanation": "A dynamic sliding window (using a hash map or set to track characters) expands until a duplicate is found, then shrinks."
+},
+{
+"type": "pattern",
+"topic": "arrays",
+"difficulty": "easy",
+"prompt": "Problem: 'Given a sorted array, remove duplicates in-place.' Which pattern should you use?",
+"options": ["Two Pointers", "Breadth First Search", "Heap", "Divide and Conquer"],
+"answer": 0,
+"explanation": "Use a 'slow' pointer for the last unique element and a 'fast' pointer to scan for new unique values."
+},
+{
+"type": "pattern",
+"topic": "trees",
+"difficulty": "medium",
+"prompt": "Problem: 'Return the level order traversal of a binary tree (node values level by level).' Which pattern is best?",
+"options": ["DFS", "BFS", "Backtracking", "Dynamic Programming"],
+"answer": 1,
+"explanation": "Breadth-First Search (BFS) using a queue is the standard way to visit nodes level-by-level."
+},
+{
+"type": "pattern",
+"topic": "graphs",
+"difficulty": "medium",
+"prompt": "Problem: 'Determine if there is a path between two nodes in a directed graph.' Which pattern is most common?",
+"options": ["Sliding Window", "Two Pointers", "DFS / BFS", "Sorting"],
+"answer": 2,
+"explanation": "Graph traversal algorithms like Depth-First Search or Breadth-First Search are designed for connectivity problems."
+},
+{
+"type": "pattern",
+"topic": "arrays",
+"difficulty": "medium",
+"prompt": "Problem: 'Given an array of coins, find the minimum number of coins to make a total amount.' Which pattern is required?",
+"options": ["Greedy", "Dynamic Programming", "Sliding Window", "Two Pointers"],
+"answer": 1,
+"explanation": "The 'Coin Change' problem has optimal substructure and overlapping subproblems, making DP necessary."
+},
+{
+"type": "pattern",
+"topic": "arrays",
+"difficulty": "hard",
+"prompt": "Problem: 'Given a set of non-overlapping intervals, insert a new interval and merge if necessary.' Which pattern fits?",
+"options": ["Sorting/Linear Scan", "Heap", "Binary Search Tree", "Backtracking"],
+"answer": 0,
+"explanation": "Since the intervals are already sorted, a single linear scan can identify where to insert and merge."
+},
+{
+"type": "pattern",
+"topic": "linked-lists",
+"difficulty": "medium",
+"prompt": "Problem: 'Detect if a linked list has a cycle.' Which pattern is famous for this?",
+"options": ["Recursion", "Fast and Slow Pointers", "Stack", "Merge Sort"],
+"answer": 1,
+"explanation": "Floyd's Cycle-Finding Algorithm (Tortoise and Hare) uses two pointers moving at different speeds."
+},
+{
+"type": "pattern",
+"topic": "top-k",
+"difficulty": "medium",
+"prompt": "Problem: 'Find the K-th largest element in an unsorted array.' Which data structure-driven pattern is optimal?",
+"options": ["Stack", "Hash Map", "Min-Heap", "Trie"],
+"answer": 2,
+"explanation": "A Min-Heap of size K allows you to track the largest elements in O(N log K) time."
+},
+{
+"type": "pattern",
+"topic": "subsets",
+"difficulty": "medium",
+"prompt": "Problem: 'Generate all possible permutations of a list of numbers.' Which pattern is most appropriate?",
+"options": ["Sliding Window", "Two Pointers", "Backtracking", "Binary Search"],
+"answer": 2,
+"explanation": "Backtracking explores all potential paths (permutations) and 'backs up' to try the next branch."
+},
+{
+"type": "pattern",
+"topic": "matrices",
+"difficulty": "medium",
+"prompt": "Problem: 'Count the number of islands in a 2D grid of 0s and 1s.' Which pattern is used?",
+"options": ["Two Pointers", "Sliding Window", "DFS / BFS", "Greedy"],
+"answer": 2,
+"explanation": "When you find a '1', you use DFS or BFS to visit and mark all connected land pieces as visited."
+},
+{
+"type": "pattern",
+"topic": "strings",
+"difficulty": "easy",
+"prompt": "Problem: 'Check if a string is a palindrome, ignoring non-alphanumeric characters.' Which pattern is best?",
+"options": ["Two Pointers", "Stack", "Dynamic Programming", "BFS"],
+"answer": 0,
+"explanation": "Compare characters from the 'start' and 'end' moving inward."
+},
+{
+"type": "pattern",
+"topic": "binary-search",
+"difficulty": "medium",
+"prompt": "Problem: 'Search for a target in a sorted array that has been rotated.' Which pattern works?",
+"options": ["Linear Search", "Modified Binary Search", "Two Pointers", "Hashing"],
+"answer": 1,
+"explanation": "Even if rotated, one half of the array will always be sorted, allowing O(log n) search."
+},
+{
+"type": "pattern",
+"topic": "greedy",
+"difficulty": "medium",
+"prompt": "Problem: 'You are at index 0 of an array. Each element is your max jump distance. Can you reach the last index?' Pattern?",
+"options": ["Dynamic Programming", "Greedy", "BFS", "Binary Search"],
+"answer": 1,
+"explanation": "In 'Jump Game,' you only need to track the furthest reachable index at each step (Greedy)."
+},
+{
+"type": "pattern",
+"topic": "monotonic-stack",
+"difficulty": "hard",
+"prompt": "Problem: 'Find the next greater element for each index in an array.' Which pattern is optimal?",
+"options": ["Two Pointers", "Sliding Window", "Monotonic Stack", "Heap"],
+"answer": 2,
+"explanation": "A monotonic stack keeps elements in a specific order to find the first larger neighbor in O(N) time."
+},
+{
+"type": "pattern",
+"topic": "intervals",
+"difficulty": "medium",
+"prompt": "Problem: 'Given a collection of intervals, merge all overlapping intervals.' Pattern?",
+"options": ["Sorting + Linear Scan", "Backtracking", "Binary Search", "Two Pointers"],
+"answer": 0,
+"explanation": "Sort by start time, then merge adjacent intervals if the current start is less than the previous end."
+},
+{
+"type": "pattern",
+"topic": "linked-lists",
+"difficulty": "medium",
+"prompt": "Problem: 'Find the middle of a linked list in a single pass.' Which pattern works?",
+"options": ["Stack", "Two Pointers (Fast/Slow)", "Recursion", "Hashing"],
+"answer": 1,
+"explanation": "When the fast pointer reaches the end, the slow pointer will be exactly in the middle."
+},
+{
+"type": "pattern",
+"topic": "tries",
+"difficulty": "hard",
+"prompt": "Problem: 'Design a data structure that supports adding words and searching for a pattern like .ad (matches 'pad', 'bad').' Pattern?",
+"options": ["Hash Set", "Trie with DFS", "Sliding Window", "Suffix Array"],
+"answer": 1,
+"explanation": "A Trie stores the words, and DFS handles the wildcard '.' by checking all children of the current node."
+},
+{
+"type": "pattern",
+"topic": "dynamic-programming",
+"difficulty": "medium",
+"prompt": "Problem: 'Find the length of the longest increasing subsequence in an array.' Which pattern fits?",
+"options": ["Two Pointers", "Sliding Window", "Dynamic Programming", "Heap"],
+"answer": 2,
+"explanation": "LIS is a classic DP problem where the result for index 'i' depends on previous indices."
+},
+{
+"type": "pattern",
+"topic": "greedy",
+"difficulty": "medium",
+"prompt": "Problem: 'Assign cookies to children such that you maximize content children based on greed factor.' Pattern?",
+"options": ["Dynamic Programming", "Greedy", "Binary Search", "Two Pointers"],
+"answer": 1,
+"explanation": "Sort both arrays and greedily give the smallest possible cookie that satisfies the child."
+},
+{
+"type": "bigO",
+"topic": "loop-analysis",
+"difficulty": "medium",
+"prompt": "What is the time complexity of the following code snippet?",
+"code": "for i in range(n):\n    for j in range(n):\n        print(i + j)",
+"options": ["O(n)", "O(n log n)", "O(n^2)", "O(2^n)"],
+"answer": 2,
+"explanation": "Two nested loops iterating up to n results in n * n operations."
+},
+{
+"type": "bigO",
+"topic": "loop-analysis",
+"difficulty": "hard",
+"prompt": "What is the time complexity of this loop where the increment is multiplied?",
+"code": "i = 1\nwhile i < n:\n    print(i)\n    i *= 2",
+"options": ["O(n)", "O(log n)", "O(n^2)", "O(1)"],
+"answer": 1,
+"explanation": "Since the loop variable doubles each time, it takes log2(n) steps to reach n."
+},
+{
+"type": "bigO",
+"topic": "loop-analysis",
+"difficulty": "hard",
+"prompt": "Calculate the complexity of these two independent loops.",
+"code": "for i in range(n):\n    print(i)\nfor j in range(m):\n    print(j)",
+"options": ["O(n^2)", "O(n * m)", "O(n + m)", "O(max(n, m))"],
+"answer": 2,
+"explanation": "Loops that are not nested are additive. The total time is O(n + m)."
+},
+{
+"type": "bigO",
+"topic": "loop-analysis",
+"difficulty": "medium",
+"prompt": "What is the complexity of this nested loop where the inner loop is constant?",
+"code": "for i in range(n):\n    for j in range(100):\n        print(i, j)",
+"options": ["O(n^2)", "O(100n)", "O(n)", "O(log n)"],
+"answer": 2,
+"explanation": "Since 100 is a constant, O(100n) simplifies to O(n) in asymptotic analysis."
+},
+{
+"type": "bigO",
+"topic": "loop-analysis",
+"difficulty": "hard",
+"prompt": "What is the complexity of this 'triangular' nested loop?",
+"code": "for i in range(n):\n    for j in range(i, n):\n        print(j)",
+"options": ["O(n)", "O(n log n)", "O(n^2)", "O(n!)"],
+"answer": 2,
+"explanation": "The number of iterations is (n + n-1 + ... + 1), which is n(n+1)/2. This simplifies to O(n^2)."
+},
+{
+"type": "bigO",
+"topic": "loop-analysis",
+"difficulty": "medium",
+"prompt": "What is the complexity of searching for an element in a 2D matrix of size N x N?",
+"code": "for row in matrix:\n    if target in row: return True",
+"options": ["O(N)", "O(N^2)", "O(log N)", "O(N log N)"],
+"answer": 1,
+"explanation": "You must check up to N rows, and each row check takes O(N) time, totaling O(N^2)."
+},
+{
+"type": "bigO",
+"topic": "math",
+"difficulty": "hard",
+"prompt": "What is the time complexity of the Sieve of Eratosthenes (finding primes up to n)?",
+"options": ["O(n log n)", "O(n log log n)", "O(n^2)", "O(sqrt(n))"],
+"answer": 1,
+"explanation": "The harmonic series of primes leads to the very efficient O(n log log n)."
+},
+{
+"type": "bigO",
+"topic": "loop-analysis",
+"difficulty": "hard",
+"prompt": "What is the complexity of this recursive function?",
+"code": "def func(n):\n    if n <= 1: return\n    func(n - 1)\n    func(n - 1)",
+"options": ["O(n)", "O(n^2)", "O(2^n)", "O(log n)"],
+"answer": 2,
+"explanation": "Each call branches into two more calls, creating a binary tree of calls with height n, or 2^n nodes."
+},
+{
+"type": "bigO",
+"topic": "loop-analysis",
+"difficulty": "medium",
+"prompt": "What is the complexity of this loop that decreases by division?",
+"code": "while n > 1:\n    n = n // 3",
+"options": ["O(n)", "O(log3 n)", "O(3^n)", "O(1)"],
+"answer": 1,
+"explanation": "Dividing the input size by a constant in each step results in logarithmic time."
+},
+{
+"type": "bigO",
+"topic": "loop-analysis",
+"difficulty": "hard",
+"prompt": "What is the complexity if the inner loop runs N times but only when 'i' is even?",
+"code": "for i in range(n):\n    if i % 2 == 0:\n        for j in range(n):\n            print(j)",
+"options": ["O(n)", "O(n^2 / 2)", "O(n^2)", "O(n log n)"],
+"answer": 2,
+"explanation": "The inner loop runs n/2 times. In Big O, constants like 1/2 are dropped, so it remains O(n^2)."
+},
+{
+"type": "bigO",
+"topic": "math",
+"difficulty": "medium",
+"prompt": "What is the complexity of checking if a number 'n' is prime by testing all divisors up to the square root of 'n'?",
+"options": ["O(n)", "O(log n)", "O(sqrt(n))", "O(1)"],
+"answer": 2,
+"explanation": "The loop runs from 2 to sqrt(n), so the complexity is O(sqrt(n))."
+},
+{
+"type": "bigO",
+"topic": "loop-analysis",
+"difficulty": "medium",
+"prompt": "What is the complexity of this nested loop setup?",
+"code": "for i in range(n):\n    k = 10\n    while k > 0:\n        k -= 1",
+"options": ["O(n^2)", "O(n)", "O(10n)", "O(log n)"],
+"answer": 1,
+"explanation": "The inner loop is constant (always 10 iterations), so the total time scales linearly with n."
+},
+{
+"type": "bigO",
+"topic": "loop-analysis",
+"difficulty": "hard",
+"prompt": "Find the complexity: a loop that runs N times and calls a function with O(log N) complexity.",
+"code": "for i in range(n):\n    binary_search(my_list, i)",
+"options": ["O(n)", "O(log n)", "O(n log n)", "O(n^2)"],
+"answer": 2,
+"explanation": "Doing a log(n) operation n times results in O(n log n)."
+},
+{
+"type": "bigO",
+"topic": "loop-analysis",
+"difficulty": "hard",
+"prompt": "What is the complexity of this square-root based loop?",
+"code": "for i in range(int(n0.5)):\n    print(i)",
+"options": ["O(n)", "O(sqrt(n))", "O(log n)", "O(n2)"],
+"answer": 1,
+"explanation": "The range is determined by the square root of n."
+},
+{
+"type": "bigO",
+"topic": "loop-analysis",
+"difficulty": "medium",
+"prompt": "Complexity of: a loop running N times, nested inside a loop running 5 times.",
+"code": "for i in range(5):\n    for j in range(n):\n        print(j)",
+"options": ["O(5n)", "O(n^2)", "O(n)", "O(5^n)"],
+"answer": 2,
+"explanation": "5 is a constant. Constant * n = O(n)."
+},
+{
+"type": "bigO",
+"topic": "loop-analysis",
+"difficulty": "hard",
+"prompt": "What is the complexity of a nested loop where the inner loop doubles its work each time?",
+"code": "for i in range(n):\n    j = 1\n    while j < i:\n        j *= 2",
+"options": ["O(n)", "O(n log n)", "O(n^2)", "O(log n)"],
+"answer": 1,
+"explanation": "The outer loop is O(n). The inner loop is O(log i). Summing log(i) from 1 to n results in O(n log n)."
+},
+{
+"type": "bigO",
+"topic": "loop-analysis",
+"difficulty": "medium",
+"prompt": "Complexity of printing all pairs (i, j) where i < j and both are less than N.",
+"options": ["O(n)", "O(n log n)", "O(n^2)", "O(1)"],
+"answer": 2,
+"explanation": "This is a standard nested relationship, creating roughly (n^2)/2 pairs."
+},
+{
+"type": "bigO",
+"topic": "loop-analysis",
+"difficulty": "hard",
+"prompt": "Complexity of: for i in range(n): for j in range(1, n, n//10)?",
+"options": ["O(n)", "O(n^2)", "O(n log n)", "O(1)"],
+"answer": 0,
+"explanation": "The inner loop always runs roughly 10 times regardless of how large n is. Thus, O(10 * n) = O(n)."
+},
+{
+"type": "bigO",
+"topic": "math",
+"difficulty": "hard",
+"prompt": "What is the complexity of calculating all permutations of a string of length N?",
+"options": ["O(n^2)", "O(2^n)", "O(n!)", "O(n^n)"],
+"answer": 2,
+"explanation": "There are n! (n factorial) possible permutations for a string of length n."
+},
+{
+"type": "bigO",
+"topic": "loop-analysis",
+"difficulty": "medium",
+"prompt": "What is the complexity of this 'gap' loop?",
+"code": "for i in range(0, n, 2):\n    print(i)",
+"options": ["O(n/2)", "O(n)", "O(log n)", "O(1)"],
+"answer": 1,
+"explanation": "Even though we skip every other number, the number of steps is still proportional to n."
+},
+{
+"type": "pattern",
+"topic": "graphs",
+"difficulty": "hard",
+"prompt": "Problem: 'Find the shortest path in a weighted graph with non-negative edge weights.' Which algorithm/pattern?",
+"options": ["BFS", "Dijkstra's Algorithm", "Bellman-Ford", "Floyd-Warshall"],
+"answer": 1,
+"explanation": "Dijkstra's is the standard optimal choice for shortest paths in weighted graphs without negative edges."
+},
+{
+"type": "pattern",
+"topic": "graphs",
+"difficulty": "hard",
+"prompt": "Problem: 'Find the shortest path in a graph where some edge weights are negative.' Which algorithm?",
+"options": ["Dijkstra's", "Bellman-Ford", "BFS", "Topological Sort"],
+"answer": 1,
+"explanation": "Bellman-Ford can handle negative weights and detect negative cycles, which Dijkstra's cannot."
+},
+{
+"type": "pattern",
+"topic": "graphs",
+"difficulty": "medium",
+"prompt": "Problem: 'Given a list of courses and their prerequisites, find a valid order to take all courses.' Which pattern?",
+"options": ["DFS", "Topological Sort (Kahn's)", "Sliding Window", "Union-Find"],
+"answer": 1,
+"explanation": "Course scheduling is a classic Directed Acyclic Graph (DAG) problem requiring Topological Sort."
+},
+{
+"type": "pattern",
+"topic": "disjoint-set",
+"difficulty": "hard",
+"prompt": "Problem: 'Given a list of edges in an undirected graph, check if adding a new edge creates a cycle.' Optimal pattern?",
+"options": ["BFS", "DFS", "Union-Find", "Backtracking"],
+"answer": 2,
+"explanation": "Union-Find (Disjoint Set Union) is the most efficient way to detect cycles in an undirected graph as you add edges."
+},
+{
+"type": "pattern",
+"topic": "design",
+"difficulty": "hard",
+"prompt": "Problem: 'Design an LRU (Least Recently Used) Cache with O(1) get and put operations.' Which combination?",
+"options": ["Hash Map + Doubly Linked List", "Singly Linked List + Stack", "Min-Heap + Array", "Binary Search Tree"],
+"answer": 0,
+"explanation": "A Hash Map provides O(1) access, while a Doubly Linked List allows O(1) reordering of the 'recency' of items."
+},
+{
+"type": "pattern",
+"topic": "strings",
+"difficulty": "hard",
+"prompt": "Problem: 'Given a list of queries, find the longest common prefix among all strings.' Which structure helps?",
+"options": ["Stack", "Trie", "Queue", "Heap"],
+"answer": 1,
+"explanation": "Inserting all strings into a Trie makes it easy to see where the common path branches off."
+},
+{
+"type": "pattern",
+"topic": "bit-manipulation",
+"difficulty": "medium",
+"prompt": "Problem: 'Given an array where every element appears twice except for one, find that single one.' Optimal pattern?",
+"options": ["Hash Set", "Sorting", "XOR Bit Manipulation", "Binary Search"],
+"answer": 2,
+"explanation": "XORing a number with itself results in 0. XORing the whole array leaves only the unique element in O(n) time and O(1) space."
+},
+{
+"type": "pattern",
+"topic": "heaps",
+"difficulty": "hard",
+"prompt": "Problem: 'Find the median from a continuous data stream.' Which strategy is best?",
+"options": ["Sort on every insert", "Two Heaps (Min-Heap & Max-Heap)", "One Large Array", "Binary Search Tree"],
+"answer": 1,
+"explanation": "Using a Max-Heap for the lower half and a Min-Heap for the upper half allows O(1) median access."
+},
+{
+"type": "pattern",
+"topic": "math",
+"difficulty": "medium",
+"prompt": "Problem: 'Check if a number is a Power of Two without using loops or recursion.' Pattern?",
+"options": ["Modulo operators", "Bit Manipulation (n & (n-1))", "Logarithmic Check", "Division"],
+"answer": 1,
+"explanation": "A power of two has exactly one bit set. (n & (n-1)) will equal 0 if n is a power of two."
+},
+{
+"type": "pattern",
+"topic": "dynamic-programming",
+"difficulty": "hard",
+"prompt": "Problem: 'Given two strings, find the length of their Longest Common Subsequence.' Pattern?",
+"options": ["Sliding Window", "Two Pointers", "2D Dynamic Programming", "Backtracking"],
+"answer": 2,
+"explanation": "LCS is a classic 2D DP problem where dp[i][j] represents the result for substrings up to those indices."
+},
+{
+"type": "pattern",
+"topic": "greedy",
+"difficulty": "medium",
+"prompt": "Problem: 'Gas Station: Given gas and cost arrays, find the starting station to complete a circuit.' Pattern?",
+"options": ["Greedy", "BFS", "Dijkstra", "Backtracking"],
+"answer": 0,
+"explanation": "A greedy approach works here: if total gas >= total cost, a solution exists. You just track the current tank."
+},
+{
+"type": "pattern",
+"topic": "recursion",
+"difficulty": "hard",
+"prompt": "Problem: 'N-Queens: Place N queens on an NxN chessboard such that no two queens attack each other.' Pattern?",
+"options": ["BFS", "Backtracking", "Dynamic Programming", "Greedy"],
+"answer": 1,
+"explanation": "N-Queens requires exploring all valid placements and backtracking when a conflict is found."
+},
+{
+"type": "pattern",
+"topic": "binary-search",
+"difficulty": "hard",
+"prompt": "Problem: 'Find the smallest divisor such that the sum of division results is less than a threshold.' Pattern?",
+"options": ["Binary Search on Answer Space", "Linear Search", "Heap Sort", "Two Pointers"],
+"answer": 0,
+"explanation": "When the result space is monotonic, you can binary search for the 'answer' itself rather than a value in the array."
+},
+{
+"type": "pattern",
+"topic": "strings",
+"difficulty": "medium",
+"prompt": "Problem: 'Implement strStr() (find the index of a needle in a haystack).' Optimal Pattern?",
+"options": ["KMP Algorithm", "Sliding Window", "Brute Force", "Two Pointers"],
+"answer": 0,
+"explanation": "Knuth-Morris-Pratt (KMP) is the classic O(N) algorithm for string pattern matching."
+},
+{
+"type": "pattern",
+"topic": "heaps",
+"difficulty": "medium",
+"prompt": "Problem: 'Rearrange characters in a string so that no two adjacent characters are the same.' Pattern?",
+"options": ["Stack", "Greedy with Max-Heap", "Sorting", "DFS"],
+"answer": 1,
+"explanation": "Always pick the character with the highest remaining frequency that isn't the one you just used."
+},
+{
+"type": "pattern",
+"topic": "math",
+"difficulty": "easy",
+"prompt": "Problem: 'Happy Number: Determine if a number eventually reaches 1 by summing squares of digits.' Pattern?",
+"options": ["Fast and Slow Pointers (Cycle Detection)", "Binary Search", "Greedy", "Stack"],
+"answer": 0,
+"explanation": "The process either hits 1 or enters a cycle. Cycle detection (Tortoise and Hare) works perfectly here."
+},
+{
+"type": "pattern",
+"topic": "intervals",
+"difficulty": "hard",
+"prompt": "Problem: 'Minimum Number of Taps to Open to Water a Garden.' Pattern?",
+"options": ["Dynamic Programming / Greedy", "BFS", "Union-Find", "Trie"],
+"answer": 0,
+"explanation": "This is a variation of the 'Video Stitching' or 'Jump Game II' problem, solved best with Greedy/DP."
+},
+{
+"type": "pattern",
+"topic": "trees",
+"difficulty": "medium",
+"prompt": "Problem: 'Binary Tree Right Side View (Only the rightmost nodes).' Pattern?",
+"options": ["BFS (Level Order)", "In-order Traversal", "Post-order Traversal", "Stack"],
+"answer": 0,
+"explanation": "BFS (Level Order) allows you to capture the last node of every level."
+},
+{
+"type": "pattern",
+"topic": "bit-manipulation",
+"difficulty": "hard",
+"prompt": "Problem: 'Counting Bits: Return an array of the number of 1's in the binary representation of 0 to N.' Pattern?",
+"options": ["Looping + bin()", "Dynamic Programming + Bit Manipulation", "Recursion", "Heap"],
+"answer": 1,
+"explanation": "The number of bits in 'i' is 'bits in i/2' plus 'i % 2'. This is O(n) using DP."
+},
+{
+"type": "pattern",
+"topic": "sliding-window",
+"difficulty": "hard",
+"prompt": "Problem: 'Minimum Window Substring (find smallest substring containing all chars of another string).' Pattern?",
+"options": ["Two Pointers", "Sliding Window with Frequency Map", "Binary Search", "Stack"],
+"answer": 1,
+"explanation": "Use a sliding window that expands to find all characters and then contracts to find the minimum length."
+},
+{
+"type": "bigO",
+"topic": "stacks-queues",
+"difficulty": "easy",
+"prompt": "Which data structure follows the Last-In, First-Out (LIFO) principle?",
+"options": ["Queue", "Stack", "Linked List", "Priority Queue"],
+"answer": 1,
+"explanation": "A Stack is like a pile of plates; the last one you put on top is the first one you take off."
+},
+{
+"type": "bigO",
+"topic": "stacks-queues",
+"difficulty": "easy",
+"prompt": "Which data structure follows the First-In, First-Out (FIFO) principle?",
+"options": ["Stack", "Queue", "Binary Tree", "Hash Map"],
+"answer": 1,
+"explanation": "A Queue is like a line at a grocery store; the first person in line is the first one served."
+},
+{
+"type": "bigO",
+"topic": "linked-lists",
+"difficulty": "medium",
+"prompt": "What is the main disadvantage of a Singly Linked List compared to an Array?",
+"options": ["Higher memory usage", "Slow insertion at the head", "No random access (O(n) to find by index)", "Fixed size"],
+"answer": 2,
+"explanation": "Arrays allow O(1) access to any index, but Linked Lists require traversing from the head to reach a specific index."
+},
+{
+"type": "bigO",
+"topic": "hashing",
+"difficulty": "medium",
+"prompt": "In a Hash Table, what occurs when two different keys hash to the same index?",
+"options": ["Overflow Error", "Collision", "Overwriting", "Double Hashing"],
+"answer": 1,
+"explanation": "A collision happens when different inputs produce the same hash. It is usually handled via Chaining or Open Addressing."
+},
+{
+"type": "bigO",
+"topic": "stacks-queues",
+"difficulty": "medium",
+"prompt": "What is the time complexity of the 'peek' operation on a Stack?",
+"options": ["O(1)", "O(n)", "O(log n)", "O(n log n)"],
+"answer": 0,
+"explanation": "Peeking only looks at the top element without removing it, which is a constant time operation."
+},
+{
+"type": "bigO",
+"topic": "linked-lists",
+"difficulty": "easy",
+"prompt": "In a Doubly Linked List, what does each node contain?",
+"options": ["Data and Next pointer", "Data and Previous pointer", "Data, Next, and Previous pointers", "Data only"],
+"answer": 2,
+"explanation": "Doubly linked lists allow bidirectional traversal by storing pointers to both the next and previous nodes."
+},
+{
+"type": "bigO",
+"topic": "stacks-queues",
+"difficulty": "hard",
+"prompt": "How many stacks are required to implement a Queue efficiently?",
+"options": ["1", "2", "3", "4"],
+"answer": 1,
+"explanation": "By using two stacks, you can reverse the order of elements to simulate a FIFO queue."
+},
+{
+"type": "bigO",
+"topic": "stacks-queues",
+"difficulty": "hard",
+"prompt": "What is the time complexity of 'enqueue' in a queue implemented with two stacks (amortized)?",
+"options": ["O(1)", "O(n)", "O(log n)", "O(n^2)"],
+"answer": 0,
+"explanation": "While some individual operations take O(n) to move elements between stacks, the average cost over time is O(1)."
+},
+{
+"type": "bigO",
+"topic": "linked-lists",
+"difficulty": "medium",
+"prompt": "Which operation is more efficient in a Linked List than in a dynamic Array?",
+"options": ["Searching for a value", "Accessing the i-th element", "Deleting the head node", "Sorting"],
+"answer": 2,
+"explanation": "Deleting the head of a Linked List is O(1), whereas an array requires shifting all remaining elements, taking O(n)."
+},
+{
+"type": "bigO",
+"topic": "hashing",
+"difficulty": "hard",
+"prompt": "What is the load factor of a Hash Table?",
+"options": ["The size of the hash function", "The ratio of stored elements to total slots", "The time it takes to hash", "The number of collisions"],
+"answer": 1,
+"explanation": "The load factor (n/k) determines when a hash table should be resized to maintain O(1) performance."
+},
+{
+"type": "bigO",
+"topic": "trees",
+"difficulty": "easy",
+"prompt": "What is the maximum number of children a node can have in a Binary Tree?",
+"options": ["1", "2", "Unlimited", "0"],
+"answer": 1,
+"explanation": "A 'Binary' tree restricts every node to at most two children: left and right."
+},
+{
+"type": "bigO",
+"topic": "trees",
+"difficulty": "medium",
+"prompt": "What is a 'Leaf' node in a tree structure?",
+"options": ["The root node", "A node with no children", "A node with exactly one child", "The tallest node"],
+"answer": 1,
+"explanation": "Nodes at the very end of branches that have no children are called leaves."
+},
+{
+"type": "bigO",
+"topic": "heaps",
+"difficulty": "medium",
+"prompt": "In a Max-Heap, where is the largest element located?",
+"options": ["The last leaf", "The root node", "The middle level", "Distributed randomly"],
+"answer": 1,
+"explanation": "A Max-Heap maintains the property that the parent is always greater than or equal to its children."
+},
+{
+"type": "bigO",
+"topic": "graphs",
+"difficulty": "easy",
+"prompt": "What is a graph with no cycles called?",
+"options": ["Directed Graph", "Acyclic Graph", "Complete Graph", "Bipartite Graph"],
+"answer": 1,
+"explanation": "An 'Acyclic' graph is one where it is impossible to start at one vertex and follow a path back to itself."
+},
+{
+"type": "bigO",
+"topic": "arrays",
+"difficulty": "easy",
+"prompt": "What is the space complexity of storing an array of N integers?",
+"options": ["O(1)", "O(n)", "O(n^2)", "O(log n)"],
+"answer": 1,
+"explanation": "Storing n items requires space proportional to n."
+},
+{
+"type": "bigO",
+"topic": "hashing",
+"difficulty": "medium",
+"prompt": "What is 'Chaining' in the context of Hash Tables?",
+"options": ["Using multiple hash functions", "Storing colliding elements in a Linked List at that index", "Increasing the table size", "Linking multiple tables together"],
+"answer": 1,
+"explanation": "Chaining handles collisions by allowing multiple elements to exist in a list at the same hash bucket."
+},
+{
+"type": "bigO",
+"topic": "linked-lists",
+"difficulty": "hard",
+"prompt": "What happens if you don't update the 'Next' pointer of the previous node when deleting a middle node in a Singly Linked List?",
+"options": ["The list is reversed", "Memory Leak / Broken Chain", "No effect", "The list becomes a circle"],
+"answer": 1,
+"explanation": "If you don't bridge the gap, the rest of the list becomes inaccessible, effectively breaking the data structure."
+},
+{
+"type": "bigO",
+"topic": "stacks-queues",
+"difficulty": "medium",
+"prompt": "Which structure is typically used to implement Undo/Redo functionality in editors?",
+"options": ["Queue", "Stack", "Binary Tree", "Array"],
+"answer": 1,
+"explanation": "A stack allows you to 'push' actions and 'pop' the most recent one to undo it."
+},
+{
+"type": "bigO",
+"topic": "graphs",
+"difficulty": "medium",
+"prompt": "What is the difference between a Directed and Undirected graph?",
+"options": ["Number of nodes", "Edges have a specific direction", "Presence of weights", "Cycle existence"],
+"answer": 1,
+"explanation": "In a directed graph (Digraph), edges are one-way arrows. In undirected graphs, edges are mutual connections."
+},
+{
+"type": "bigO",
+"topic": "trees",
+"difficulty": "medium",
+"prompt": "In a Full Binary Tree, every node has either:",
+"options": ["0 or 1 children", "0 or 2 children", "Exactly 2 children", "1 or 2 children"],
+"answer": 1,
+"explanation": "A full binary tree (sometimes called a proper binary tree) ensures no node has only one child."
+},
+{
+"type": "bugspot",
+"topic": "python-identity",
+"difficulty": "medium",
+"prompt": "Why might 'a is b' be True for small integers but False for large ones?",
+"code": "a = 256; b = 256; print(a is b) # True\na = 257; b = 257; print(a is b) # False",
+"options": ["Memory corruption", "Integer Interning", "Syntax Error", "Large numbers are strings"],
+"answer": 1,
+"explanation": "Python 'interns' or pre-caches small integers (typically -5 to 256). For numbers outside this range, new objects are created in memory, so 'is' (identity) returns False."
+},
+{
+"type": "bugspot",
+"topic": "python-closures",
+"difficulty": "hard",
+"prompt": "What will this code print (Late Binding issue)?",
+"code": "funcs = [lambda: i for i in range(3)]\nprint([f() for f in funcs])",
+"options": ["[0, 1, 2]", "[2, 2, 2]", "[None, None, None]", "Error"],
+"answer": 1,
+"explanation": "Python's closures are late-binding. By the time the functions are called, the loop has finished and 'i' is 2, so all functions return 2."
+},
+{
+"type": "bugspot",
+"topic": "python-tuples",
+"difficulty": "medium",
+"prompt": "Why does this throw a TypeError?",
+"code": "t = (1, 2, [3, 4])\nt[2].append(5) # Works\nt[2] += [6] # Error",
+"options": ["List is constant", "Tuples are immutable", "In-place add creates new list", "Syntax Error"],
+"answer": 1,
+"explanation": "The += operator on a list tries to re-assign the result back to the tuple index. Since tuples are immutable, the assignment fails even if the list was modified in-place."
+},
+{
+"type": "bugspot",
+"topic": "python-scope",
+"difficulty": "medium",
+"prompt": "What is the issue with this 'global' modification?",
+"code": "count = 0\ndef inc():\n    count += 1\ninc()",
+"options": ["Syntax Error", "UnboundLocalError", "Logic Error", "None"],
+"answer": 1,
+"explanation": "To modify a global variable inside a function, you must declare 'global count'. Otherwise, Python assumes it's a local variable before it's defined."
+},
+{
+"type": "bugspot",
+"topic": "python-lists",
+"difficulty": "medium",
+"prompt": "What happens when you multiply a list containing a list?",
+"code": "arr = [[]] * 3\narr[0].append(1)\nprint(arr)",
+"options": ["[[1], [], []]", "[[1], [1], [1]]", "[[1, 1, 1]]", "Error"],
+"answer": 1,
+"explanation": "The * operator copies the reference to the inner list. All three indices point to the same object in memory."
+},
+{
+"type": "bugspot",
+"topic": "python-logic",
+"difficulty": "easy",
+"prompt": "What is the result of 0.1 + 0.2 == 0.3 in Python?",
+"code": "print(0.1 + 0.2 == 0.3)",
+"options": ["True", "False", "None", "Error"],
+"answer": 1,
+"explanation": "Due to floating-point binary representation, 0.1 + 0.2 results in 0.30000000000000004, which is not exactly 0.3."
+},
+{
+"type": "bugspot",
+"topic": "python-syntax",
+"difficulty": "easy",
+"prompt": "What's the bug in this multi-line string?",
+"code": "s = 'This is a \n long string'",
+"options": ["Missing quotes", "Line break without escape or triple quotes", "Wrong indentation", "None"],
+"answer": 1,
+"explanation": "Standard single/double quotes cannot span multiple lines without a backslash (\\) or using triple quotes (''' or \"\"\")."
+},
+{
+"type": "bugspot",
+"topic": "python-comparison",
+"difficulty": "medium",
+"prompt": "What does '1 < 2 < 3' evaluate to in Python?",
+"code": "print(1 < 2 < 3)",
+"options": ["True", "False", "Error", "None"],
+"answer": 0,
+"explanation": "Python supports 'operator chaining'. This is equivalent to (1 < 2) and (2 < 3)."
+},
+{
+"type": "bugspot",
+"topic": "python-init",
+"difficulty": "medium",
+"prompt": "Why does this class fail to store the name?",
+"code": "class User:\n    def init(name):\n        name = name",
+"options": ["Missing 'self'", "Wrong function name", "Syntax error", "Missing return"],
+"answer": 0,
+"explanation": "The first argument must be 'self' to bind the value to the instance (e.g., self.name = name)."
+},
+{
+"type": "bugspot",
+"topic": "python-copy",
+"difficulty": "hard",
+"prompt": "What is the difference between copy() and deepcopy() for nested lists?",
+"code": "import copy\na = [[1]]\nb = copy.copy(a)",
+"options": ["No difference", "b is a deep copy", "b's inner list is the same object as a's", "Error"],
+"answer": 2,
+"explanation": "A shallow copy (copy()) only copies the outer list; the nested objects are still references to the originals."
+},
+{
+"type": "bugspot",
+"topic": "python-iter",
+"difficulty": "medium",
+"prompt": "What is the problem with this dictionary iteration?",
+"code": "d = {'a': 1}\nfor k in d:\n    if k == 'a': d['b'] = 2",
+"options": ["Logic Error", "RuntimeError: dictionary changed size during iteration", "Syntax Error", "None"],
+"answer": 1,
+"explanation": "Python does not allow you to add or remove keys from a dictionary while iterating over it."
+},
+{
+"type": "bugspot",
+"topic": "python-bool",
+"difficulty": "easy",
+"prompt": "In Python, which of these is NOT 'Falsy'?",
+"options": ["[] (empty list)", "0 (zero)", "None", "'False' (string)"],
+"answer": 3,
+"explanation": "An empty list, the number 0, and None are Falsy. However, a non-empty string like 'False' is Truthy."
+},
+{
+"type": "bugspot",
+"topic": "python-import",
+"difficulty": "hard",
+"prompt": "What happens if two files try to import each other (Circular Import)?",
+"code": "# a.py: import b\n# b.py: import a",
+"options": ["Python crashes", "ImportError or AttributeError", "It works fine", "Infinite Loop"],
+"answer": 1,
+"explanation": "Circular imports often lead to errors because one module tries to access a member of the other before it has finished initializing."
+},
+{
+"type": "bugspot",
+"topic": "python-sort",
+"difficulty": "medium",
+"prompt": "What does 'list.sort()' return?",
+"code": "items = [3, 1, 2]\nx = items.sort()",
+"options": ["[1, 2, 3]", "None", "The original list", "Error"],
+"answer": 1,
+"explanation": "The .sort() method sorts the list in-place and returns None. Use sorted(items) if you want a new list returned."
+},
+{
+"type": "bugspot",
+"topic": "python-strings",
+"difficulty": "medium",
+"prompt": "Why does 'a == b' work but 'a is b' fail for user input?",
+"code": "a = 'hello'\nb = input('Type hello: ') # User types 'hello'",
+"options": ["Input strings are never interned", "Encoding mismatch", "Syntax Error", "Logic Error"],
+"answer": 0,
+"explanation": "Strings created at runtime (like input) are generally not interned, so they have different memory addresses even if the content is the same."
+},
+{
+"type": "bugspot",
+"topic": "python-functions",
+"difficulty": "easy",
+"prompt": "What is the issue here?",
+"code": "def add(a, b):\n    print(a + b)\n\nres = add(5, 5)\nprint(res * 2)",
+"options": ["Syntax Error", "TypeError (NoneType * int)", "Logic Error", "None"],
+"answer": 1,
+"explanation": "The 'add' function prints the result but does not 'return' it. Therefore, 'res' is None."
+},
+{
+"type": "bugspot",
+"topic": "python-eval",
+"difficulty": "hard",
+"prompt": "Why is using 'eval()' on user input considered a 'bug'?",
+"code": "eval(input())",
+"options": ["It's slow", "Security vulnerability (Code Injection)", "It only works for math", "Syntax Error"],
+"answer": 1,
+"explanation": "eval() executes strings as Python code. A malicious user could type 'import os; os.remove(...)' to delete files."
+},
+{
+"type": "bugspot",
+"topic": "python-tuple-syntax",
+"difficulty": "medium",
+"prompt": "How do you define a tuple with exactly one element?",
+"options": ["(1)", "[1]", "(1,)", "tuple(1)"],
+"answer": 2,
+"explanation": "In Python, (1) is just an integer in parentheses. To make it a tuple, you must include a trailing comma: (1,)."
+},
+{
+"type": "bugspot",
+"topic": "python-del",
+"difficulty": "medium",
+"prompt": "Does 'del object' remove the object from memory?",
+"options": ["Yes, immediately", "It only removes the name/reference", "It calls the garbage collector", "No"],
+"answer": 1,
+"explanation": "The 'del' keyword removes the reference. The object is only removed from memory by the garbage collector when its reference count hits zero."
+},
+{
+"type": "bugspot",
+"topic": "python-walrus",
+"difficulty": "medium",
+"prompt": "What is the name of this operator ':=' introduced in Python 3.8?",
+"code": "if (n := len(data)) > 10:",
+"options": ["Arrow Operator", "Walrus Operator", "Assignment Operator", "Comparison Operator"],
+"answer": 1,
+"explanation": "The walrus operator allows you to assign a value to a variable as part of an expression."
+},
+{
+"type": "bigO",
+"topic": "recursion",
+"difficulty": "hard",
+"prompt": "What is the time complexity of the Tower of Hanoi problem for 'n' disks?",
+"options": ["O(n^2)", "O(2^n)", "O(n!)", "O(log n)"],
+"answer": 1,
+"explanation": "To move n disks, you must move n-1 disks twice, plus the largest disk once, leading to a recurrence of T(n) = 2T(n-1) + 1, which is O(2^n)."
+},
+{
+"type": "bigO",
+"topic": "sorting",
+"difficulty": "medium",
+"prompt": "Which of these sorting algorithms is NOT stable?",
+"options": ["Merge Sort", "Insertion Sort", "Quick Sort", "Bubble Sort"],
+"answer": 2,
+"explanation": "Stability means elements with the same value retain their relative order. Quick Sort's partitioning can swap equal elements unpredictably."
+},
+{
+"type": "bigO",
+"topic": "sorting",
+"difficulty": "hard",
+"prompt": "What is the best-case time complexity of Quick Sort?",
+"options": ["O(n)", "O(n log n)", "O(n^2)", "O(log n)"],
+"answer": 1,
+"explanation": "If the pivot always splits the array into two equal halves, the depth of the tree is log n and the work per level is n."
+},
+{
+"type": "bigO",
+"topic": "sorting",
+"difficulty": "medium",
+"prompt": "Which sorting algorithm is ideal for nearly-sorted data?",
+"options": ["Quick Sort", "Insertion Sort", "Selection Sort", "Merge Sort"],
+"answer": 1,
+"explanation": "Insertion Sort only takes O(n) time when the array is already or nearly sorted, as it requires fewer swaps."
+},
+{
+"type": "bigO",
+"topic": "space-complexity",
+"difficulty": "hard",
+"prompt": "What is the space complexity of a recursive implementation of Factorial(n)?",
+"options": ["O(1)", "O(n)", "O(log n)", "O(n^2)"],
+"answer": 1,
+"explanation": "Even though you only store one number per call, the recursion stack grows to size n."
+},
+{
+"type": "bigO",
+"topic": "sorting",
+"difficulty": "medium",
+"prompt": "What is the time complexity of Selection Sort in the best case?",
+"options": ["O(n)", "O(n log n)", "O(n^2)", "O(1)"],
+"answer": 2,
+"explanation": "Selection Sort always scans the remaining list to find the minimum, regardless of how sorted the input is."
+},
+{
+"type": "bigO",
+"topic": "sorting",
+"difficulty": "hard",
+"prompt": "Which algorithm is used internally by Python's 'sorted()' function?",
+"options": ["Quick Sort", "Merge Sort", "Timsort", "Heap Sort"],
+"answer": 2,
+"explanation": "Timsort is a hybrid stable sorting algorithm derived from merge sort and insertion sort."
+},
+{
+"type": "bigO",
+"topic": "trees",
+"difficulty": "medium",
+"prompt": "What is the time complexity of finding the successor of a node in a balanced BST?",
+"options": ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+"answer": 1,
+"explanation": "Finding a successor involves traversing the height of the tree, which is log n in a balanced tree."
+},
+{
+"type": "bigO",
+"topic": "heaps",
+"difficulty": "hard",
+"prompt": "What is the time complexity of extracting the minimum element from a Min-Heap?",
+"options": ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+"answer": 1,
+"explanation": "While finding the min is O(1), removing it requires 'bubbling down' the last element to restore the heap property, which takes O(log n)."
+},
+{
+"type": "bigO",
+"topic": "recursion",
+"difficulty": "medium",
+"prompt": "What is 'Tail Recursion'?",
+"options": ["Recursion at the start of a function", "A function where the recursive call is the last action", "A function with multiple base cases", "Infinite recursion"],
+"answer": 1,
+"explanation": "Tail recursion allows some compilers to optimize the stack usage so it doesn't grow with each call."
+},
+{
+"type": "bigO",
+"topic": "space-complexity",
+"difficulty": "medium",
+"prompt": "What is the auxiliary space complexity of Heap Sort?",
+"options": ["O(1)", "O(n)", "O(log n)", "O(n log n)"],
+"answer": 0,
+"explanation": "Heap Sort is an in-place sorting algorithm, requiring only a constant amount of extra space."
+},
+{
+"type": "bigO",
+"topic": "sorting",
+"difficulty": "medium",
+"prompt": "In Merge Sort, what is the complexity of the 'Merge' step for two sub-arrays of size n/2?",
+"options": ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+"answer": 2,
+"explanation": "Merging two sorted arrays of combined size n requires one pass through both, which is O(n)."
+},
+{
+"type": "bigO",
+"topic": "sorting",
+"difficulty": "hard",
+"prompt": "What is the worst-case complexity of Counting Sort?",
+"options": ["O(n log n)", "O(n^2)", "O(n + k)", "O(n!)"],
+"answer": 2,
+"explanation": "Counting sort is linear, where n is the number of elements and k is the range of the input values."
+},
+{
+"type": "bigO",
+"topic": "sorting",
+"difficulty": "hard",
+"prompt": "Which sorting algorithm would you use if you had severe memory constraints (O(1) space) but needed O(n log n) time?",
+"options": ["Merge Sort", "Quick Sort", "Heap Sort", "Bubble Sort"],
+"answer": 2,
+"explanation": "Heap Sort is O(n log n) in all cases and operates in-place (O(1) space)."
+},
+{
+"type": "bigO",
+"topic": "trees",
+"difficulty": "hard",
+"prompt": "What is the time complexity of a Level-order traversal of a tree with N nodes?",
+"options": ["O(log n)", "O(n)", "O(n log n)", "O(2^n)"],
+"answer": 1,
+"explanation": "Every node must be visited and queued exactly once, making it linear."
+},
+{
+"type": "bigO",
+"topic": "recursion",
+"difficulty": "medium",
+"prompt": "How many recursive calls are made in a binary search of an array of size 16 (worst case)?",
+"options": ["16", "8", "4", "5"],
+"answer": 3,
+"explanation": "log2(16) is 4, but we include the final call/base case check, resulting in 4-5 steps."
+},
+{
+"type": "bigO",
+"topic": "logic",
+"difficulty": "medium",
+"prompt": "What is the 'Stable' property in sorting useful for?",
+"options": ["Reducing time complexity", "Sorting by multiple criteria (e.g., Name then Date)", "Saving memory", "Sorting strings faster"],
+"answer": 1,
+"explanation": "A stable sort preserves the previous order of equal elements, allowing you to layer sorts on different keys."
+},
+{
+"type": "bigO",
+"topic": "sorting",
+"difficulty": "hard",
+"prompt": "What is the time complexity of Bucket Sort in the average case?",
+"options": ["O(n^2)", "O(n log n)", "O(n + k)", "O(n)"],
+"answer": 3,
+"explanation": "If the input is uniformly distributed, Bucket Sort can achieve O(n) average time."
+},
+{
+"type": "bigO",
+"topic": "recursion",
+"difficulty": "hard",
+"prompt": "What is the time complexity of generating all subsets of a set (Power Set)?",
+"options": ["O(n^2)", "O(2^n)", "O(n!)", "O(n)"],
+"answer": 1,
+"explanation": "For every element, you have two choices (include or exclude), resulting in 2^n possible subsets."
+},
+{
+"type": "bigO",
+"topic": "math",
+"difficulty": "hard",
+"prompt": "What is the complexity of calculating x^n using the 'Exponentiation by Squaring' method?",
+"options": ["O(n)", "O(log n)", "O(sqrt(n))", "O(1)"],
+"answer": 1,
+"explanation": "By halving the exponent at each step (x^n = (x^2)^(n/2)), you reach the result in logarithmic time."
+},
+{
+"type": "bigO",
+"topic": "python-lists",
+"difficulty": "medium",
+"prompt": "What is the complexity of 'my_list.insert(0, value)'?",
+"options": ["O(1)", "O(n)", "O(log n)", "O(n^2)"],
+"answer": 1,
+"explanation": "Inserting at the front requires shifting every other element in the list one position to the right."
+},
+{
+"type": "bugspot",
+"topic": "python-logic",
+"difficulty": "hard",
+"prompt": "What does this evaluate to: 'not False or True and False'?",
+"options": ["True", "False", "Error", "None"],
+"answer": 0,
+"explanation": "Operator precedence: 'not' first, then 'and', then 'or'. So: (not False) or (True and False) -> True or False -> True."
+},
+{
+"type": "pattern",
+"topic": "arrays",
+"difficulty": "medium",
+"prompt": "Problem: 'Find the two numbers in a sorted array that sum to a target.' Optimal pattern?",
+"options": ["Sliding Window", "Two Pointers", "Binary Search", "Backtracking"],
+"answer": 1,
+"explanation": "With a sorted array, you can use one pointer at the start and one at the end, moving them inward based on the sum."
+},
+{
+"type": "bigO",
+"topic": "trees",
+"difficulty": "hard",
+"prompt": "In a Red-Black Tree, what is the maximum height relative to a tree with N nodes?",
+"options": ["O(n)", "O(n log n)", "O(2 log n)", "O(sqrt(n))"],
+"answer": 2,
+"explanation": "Red-Black trees are approximately balanced, guaranteeing a height of no more than 2 * log(n+1)."
+},
+{
+"type": "bugspot",
+"topic": "python-scope",
+"difficulty": "medium",
+"prompt": "What happens if a variable is assigned inside a function but used before assignment?",
+"code": "x = 10\ndef func():\n    print(x)\n    x = 5\nfunc()",
+"options": ["Prints 10", "Prints 5", "UnboundLocalError", "None"],
+"answer": 2,
+"explanation": "Python sees the assignment 'x = 5' and flags 'x' as local to the entire scope, so the print fails because 'x' isn't defined yet."
+},
+{
+"type": "bigO",
+"topic": "hashing",
+"difficulty": "easy",
+"prompt": "What is the average time complexity of inserting into a Hash Set?",
+"options": ["O(1)", "O(n)", "O(log n)", "O(n log n)"],
+"answer": 0,
+"explanation": "Assuming a good hash function, insertion is constant time on average."
+},
+{
+"type": "pattern",
+"topic": "sorting",
+"difficulty": "medium",
+"prompt": "Which sort should you use if you want to minimize the number of 'swaps' (writes to memory)?",
+"options": ["Bubble Sort", "Quick Sort", "Selection Sort", "Merge Sort"],
+"answer": 2,
+"explanation": "Selection Sort only performs O(n) swaps in the worst case, as it only swaps once per outer loop iteration."
+},
+{
+"type": "bigO",
+"topic": "graphs",
+"difficulty": "medium",
+"prompt": "What is the space complexity of an Adjacency Matrix for a graph with V vertices?",
+"options": ["O(V)", "O(V + E)", "O(V^2)", "O(E)"],
+"answer": 2,
+"explanation": "A matrix requires a row and a column for every vertex, regardless of how many edges exist."
+},
+{
+"type": "bugspot",
+"topic": "python-identity",
+"difficulty": "medium",
+"prompt": "What is the result of: [1, 2] == [1, 2] vs [1, 2] is [1, 2]?",
+"options": ["True, True", "True, False", "False, True", "False, False"],
+"answer": 1,
+"explanation": "== checks for equality of values (True). 'is' checks if they are the exact same object in memory (False)."
+},
+{
+"type": "pattern",
+"topic": "trees",
+"difficulty": "hard",
+"prompt": "Problem: 'Find the lowest common ancestor (LCA) of two nodes in a Binary Tree.' Pattern?",
+"options": ["BFS", "DFS / Recursion", "Sliding Window", "Sorting"],
+"answer": 1,
+"explanation": "You recurse down the tree; if a node finds one target in the left branch and one in the right, that node is the LCA."
+},
+{
+"type": "bigO",
+"topic": "recursion",
+"difficulty": "medium",
+"prompt": "What is the complexity of a recursive function that makes 3 calls at each level and has a depth of N?",
+"options": ["O(3n)", "O(n^3)", "O(3^n)", "O(log3 n)"],
+"answer": 2,
+"explanation": "The number of calls grows exponentially: 1 -> 3 -> 9 -> 27... which is 3^n."
+},
+{
+"type": "bugspot",
+"topic": "python-strings",
+"difficulty": "easy",
+"prompt": "How many times will 'Lo' be printed?",
+"code": "for i in range(5):\n    if i == 3: break\n    print('Lo')",
+"options": ["3", "4", "5", "Infinite"],
+"answer": 0,
+"explanation": "The loop runs for i=0, 1, 2. When i hits 3, it breaks before printing."
+},
+{
+"type": "pattern",
+"topic": "bits",
+"difficulty": "medium",
+"prompt": "How do you divide an integer by 2 using bit shifting?",
+"options": ["n << 1", "n >> 1", "n & 1", "n ^ 1"],
+"answer": 1,
+"explanation": "A right shift by 1 bit is equivalent to floor division by 2."
+},
+{
+"type": "bigO",
+"topic": "logic",
+"difficulty": "medium",
+"prompt": "If an algorithm's complexity is O(N!), what happens if N increases from 10 to 11?",
+"options": ["Work increases by 1 unit", "Work increases by 10 units", "Work is 11 times greater", "Work doubles"],
+"answer": 2,
+"explanation": "Since (n+1)! = (n+1) * n!, the amount of work is multiplied by the new value of n."
+},
+{
+"type": "bugspot",
+"topic": "python-lists",
+"difficulty": "medium",
+"prompt": "What is the result of: bool([])?",
+"options": ["True", "False", "Error", "None"],
+"answer": 1,
+"explanation": "Empty collections (lists, sets, dicts, strings) are always Falsy in Python."
+},
+{
+"type": "pattern",
+"topic": "dynamic-programming",
+"difficulty": "hard",
+"prompt": "Problem: 'Edit Distance (minimum operations to turn string A into B).' Which DP approach?",
+"options": ["1D DP", "2D DP", "3D DP", "Greedy"],
+"answer": 1,
+"explanation": "You use a 2D table where dp[i][j] stores the edit distance between a prefix of A and a prefix of B."
+},
+{
+"type": "bigO",
+"topic": "heaps",
+"difficulty": "medium",
+"prompt": "In a complete binary tree with N nodes, what is the height?",
+"options": ["O(log n)", "O(n)", "O(sqrt(n))", "O(1)"],
+"answer": 0,
+"explanation": "Complete binary trees (like heaps) are always balanced, so their height is logarithmic."
+},
+{
+"type": "bugspot",
+"topic": "python-dicts",
+"difficulty": "medium",
+"prompt": "What will d.get('x', 0) return if 'x' is not in the dictionary?",
+"options": ["None", "KeyError", "0", "False"],
+"answer": 2,
+"explanation": "The .get() method returns the second argument as a default if the key is missing."
+},
+{
+"type": "pattern",
+"topic": "graphs",
+"difficulty": "medium",
+"prompt": "Problem: 'Find the strongly connected components in a directed graph.' Algorithm?",
+"options": ["Dijkstra's", "Tarjan's or Kosaraju's", "Kruskal's", "Prim's"],
+"answer": 1,
+"explanation": "Tarjan's and Kosaraju's are the two primary algorithms for finding SCCs."
+},
+{
+"type": "bigO",
+"topic": "arrays",
+"difficulty": "easy",
+"prompt": "What is the time complexity of reversing an array in-place?",
+"options": ["O(1)", "O(log n)", "O(n)", "O(n^2)"],
+"answer": 2,
+"explanation": "You must swap elements from the outer edges inward, touching roughly n/2 elements, which is O(n)."
+}
+]

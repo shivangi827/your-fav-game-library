@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://your-fav-game-library.onrender.com/sitemap.xml

@@ -1,0 +1,16 @@
+node_modules/
+dist/
+public/imposter/app.js
+public/imposter/app.js.map
+public/vibe-check/app.js
+public/vibe-check/app.js.map
+public/never-have-i-ever/app.js
+public/never-have-i-ever/app.js.map
+public/zombie-survival/app.js
+public/zombie-survival/app.js.map
+public/word-scramble/app.js
+public/word-scramble/app.js.map
+public/bounty-of-the-lost/app.js
+public/bounty-of-the-lost/app.js.map
+*.pdf
+.DS_Store

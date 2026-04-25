@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeCrack Pro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="lobby">
+            <h1>CODECRACK</h1>
+            
+            <div class="setup-section">
+                <h3>1. Select Difficulty</h3>
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="setDifficulty('easy')">Easy</button>
+                    <button class="tab-btn" onclick="setDifficulty('medium')">Medium</button>
+                    <button class="tab-btn" onclick="setDifficulty('hard')">Hard</button>
+                </div>
+            </div>
+
+            <div class="setup-section">
+                <h3>2. Select Category</h3>
+                <div class="category-grid">
+                    <button class="cat-btn" onclick="setCategory('bigO')">Time Complexity</button>
+                    <button class="cat-btn" onclick="setCategory('bugspot')">Bug Spotting</button>
+                    <button class="cat-btn" onclick="setCategory('pattern')">Pattern Match</button>
+                </div>
+            </div>
+
+            <div class="setup-section">
+                <h3>3. Select Timer</h3>
+                <div class="timer-grid">
+                    <button class="time-btn" onclick="setTimer(120)">2 Min</button>
+                    <button class="time-btn" onclick="setTimer(180)">3 Min</button>
+                    <button class="time-btn" onclick="setTimer(300)">5 Min</button>
+                </div>
+            </div>
+
+            <button id="start-btn" onclick="startGame()" disabled>START CRACKING</button>
+        </div>
+
+        <div id="arena" class="hidden">
+            <div class="stats-bar">
+                <span>Time: <b id="timer-display">0:00</b></span>
+                <span>Score: <b id="score-display">0</b></span>
+            </div>
+            <p id="prompt-text"></p>
+            <pre id="code-block"></pre>
+            <div id="options-grid"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
