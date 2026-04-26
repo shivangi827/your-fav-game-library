@@ -1,6 +1,5 @@
 (function () {
   var TERMS_KEY = 'gamelibrary.terms.v1';
-  var PROJECT_ID = 'wdrprbujsc';
 
   function hasAccepted() {
     try { return localStorage.getItem(TERMS_KEY) === 'accepted'; }
@@ -10,19 +9,6 @@
   function markAccepted() {
     try { localStorage.setItem(TERMS_KEY, 'accepted'); }
     catch (e) { /* ignore */ }
-  }
-
-  function loadClarity(id) {
-    var w = window;
-    if (w.clarity) return;
-    w.clarity = function () {
-      (w.clarity.q = w.clarity.q || []).push(arguments);
-    };
-    var s = document.createElement('script');
-    s.async = true;
-    s.src = 'https://www.clarity.ms/tag/' + id;
-    var first = document.getElementsByTagName('script')[0];
-    first.parentNode.insertBefore(s, first);
   }
 
   function showModal(readOnly) {
@@ -40,21 +26,24 @@
     if (modal) modal.classList.add('hidden');
   }
 
-  if (hasAccepted()) {
-    loadClarity(PROJECT_ID);
-  } else {
+  if (!hasAccepted()) {
     showModal(false);
   }
 
-  document.getElementById('btn-terms-accept').addEventListener('click', function () {
-    markAccepted();
-    hideModal();
-    loadClarity(PROJECT_ID);
-  });
+  var acceptBtn = document.getElementById('btn-terms-accept');
+  if (acceptBtn) {
+    acceptBtn.addEventListener('click', function () {
+      markAccepted();
+      hideModal();
+    });
+  }
 
-  document.getElementById('btn-terms-close').addEventListener('click', function () {
-    hideModal();
-  });
+  var closeBtn = document.getElementById('btn-terms-close');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', function () {
+      hideModal();
+    });
+  }
 
   var termsLink = document.getElementById('footer-terms');
   if (termsLink) {
