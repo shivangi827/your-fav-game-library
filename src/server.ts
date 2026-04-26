@@ -95,11 +95,11 @@ app.get('/api/codecrack/configured', async (_req, res) => {
 app.get('/api/codecrack/scores/:difficulty/:timeMode', async (req, res) => {
   const difficulty = req.params.difficulty;
   const timeMode = Number(req.params.timeMode);
-  if (!['easy', 'medium', 'hard'].includes(difficulty)) {
-    res.status(400).json({ error: 'Invalid difficulty' });
+  if (!['bigO', 'bugspot', 'pattern'].includes(difficulty)) {
+    res.status(400).json({ error: 'Invalid category' });
     return;
   }
-  if (![120, 180, 300].includes(timeMode)) {
+  if (![60, 120, 180].includes(timeMode)) {
     res.status(400).json({ error: 'Invalid time mode' });
     return;
   }
@@ -109,11 +109,11 @@ app.get('/api/codecrack/scores/:difficulty/:timeMode', async (req, res) => {
 
 app.post('/api/codecrack/scores', express.json(), async (req, res) => {
   const { difficulty, timeMode, name, score, correct, total, streak, date } = req.body as CodeCrackScoreEntry;
-  if (!['easy', 'medium', 'hard'].includes(difficulty)) {
-    res.status(400).json({ error: 'Invalid difficulty' });
+  if (!['bigO', 'bugspot', 'pattern'].includes(difficulty)) {
+    res.status(400).json({ error: 'Invalid category' });
     return;
   }
-  if (![120, 180, 300].includes(timeMode) || !name || typeof score !== 'number') {
+  if (![60, 120, 180].includes(timeMode) || !name || typeof score !== 'number') {
     res.status(400).json({ error: 'Invalid data' });
     return;
   }
