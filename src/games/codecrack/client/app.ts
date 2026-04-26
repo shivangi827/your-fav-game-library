@@ -21,7 +21,9 @@ let selectedCategory: Category | null = null;
 let selectedTime: TimeMode | null = null;
 
 let pool: Question[] = [];
-let qIdx = 0;
+let seen: Set<number> = new Set();
+let lastPrompt = '';
+let currentQ: Question | null = null;
 let score = 0;
 let correct = 0;
 let streak = 0;
@@ -123,7 +125,9 @@ startBtn.addEventListener('click', () => {
     return;
   }
 
-  qIdx = 0;
+  currentQ = null;
+  seen = new Set();
+  lastPrompt = '';
   score = 0;
   correct = 0;
   streak = 0;
@@ -155,13 +159,39 @@ startBtn.addEventListener('click', () => {
   }, 1000);
 });
 
-function loadQuestion() {
-  if (qIdx >= pool.length) {
-    pool = shuffle([...pool]);
-    qIdx = 0;
+function pickNext(): Question {
+  // Try unseen questions first
+  let unseen = pool.filter((_, i) => !seen.has(i));
+
+  // If all seen, pull in same-difficulty questions from other categories as bonus pool
+  if (unseen.length === 0) {
+    const bonus = allQuestions.filter(
+      q => q.difficulty === selectedDifficulty && q.type !== selectedCategory && !pool.includes(q)
+    );
+    if (bonus.length > 0) {
+      const start = pool.length;
+      pool.push(...shuffle(bonus));
+      unseen = pool.filter((_, i) => !seen.has(i));
+    }
   }
 
-  const q = pool[qIdx];
+  // If still nothing unseen (exhausted everything), reset seen but avoid the last prompt
+  if (unseen.length === 0) {
+    seen.clear();
+    unseen = pool.filter(q => q.prompt !== lastPrompt);
+    if (unseen.length === 0) unseen = [...pool];
+  }
+
+  const pick = unseen[Math.floor(Math.random() * unseen.length)];
+  const idx = pool.indexOf(pick);
+  if (idx >= 0) seen.add(idx);
+  lastPrompt = pick.prompt;
+  return pick;
+}
+
+function loadQuestion() {
+  const q = pickNext();
+  currentQ = q;
   answered = false;
 
   promptText.textContent = q.prompt;
@@ -188,11 +218,11 @@ function loadQuestion() {
 }
 
 function selectAnswer(ansIdx: number) {
-  if (answered || timer === null) return;
+  if (answered || timer === null || !currentQ) return;
   answered = true;
   total++;
 
-  const q = pool[qIdx];
+  const q = currentQ;
   const isCorrect = ansIdx === q.answer;
 
   if (isCorrect) {
@@ -222,7 +252,6 @@ function selectAnswer(ansIdx: number) {
 
   setTimeout(() => {
     if (timer === null) return;
-    qIdx++;
     loadQuestion();
   }, isCorrect ? 1500 : 2200);
 }
