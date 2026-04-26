@@ -1,70 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CodeCrack</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodeCrack</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="/consent.css" />
+  <link rel="stylesheet" href="/feedback.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet" />
 </head>
 <body>
-    <div id="game-container">
-        <!-- Lobby -->
-        <div id="lobby">
-            <a href="/" class="back-link">&larr; Home</a>
-            <h1>CODECRACK</h1>
 
-            <div class="setup-section">
-                <h3>1. Select Difficulty</h3>
-                <div class="tabs" id="diff-tabs">
-                    <button class="tab-btn" data-diff="easy">Easy</button>
-                    <button class="tab-btn" data-diff="medium">Medium</button>
-                    <button class="tab-btn" data-diff="hard">Hard</button>
-                </div>
-            </div>
+<div class="floating-bg" aria-hidden="true">
+  <span class="floater" style="left:5%;animation-duration:20s;animation-delay:0s;font-size:1.4rem">&gt;_</span>
+  <span class="floater" style="left:15%;animation-duration:24s;animation-delay:3s;font-size:1rem">{ }</span>
+  <span class="floater" style="left:28%;animation-duration:18s;animation-delay:7s;font-size:1.6rem">&gt;_</span>
+  <span class="floater" style="left:40%;animation-duration:22s;animation-delay:1s;font-size:1.2rem">[ ]</span>
+  <span class="floater" style="left:55%;animation-duration:26s;animation-delay:5s;font-size:1.3rem">&gt;_</span>
+  <span class="floater" style="left:68%;animation-duration:19s;animation-delay:9s;font-size:1.8rem">{ }</span>
+  <span class="floater" style="left:80%;animation-duration:21s;animation-delay:2s;font-size:1.1rem">&gt;_</span>
+  <span class="floater" style="left:92%;animation-duration:23s;animation-delay:6s;font-size:1.5rem">[ ]</span>
+</div>
 
-            <div class="setup-section">
-                <h3>2. Select Category</h3>
-                <div class="category-grid" id="cat-tabs">
-                    <button class="cat-btn" data-cat="bigO">Time Complexity</button>
-                    <button class="cat-btn" data-cat="bugspot">Bug Spotting</button>
-                    <button class="cat-btn" data-cat="pattern">Pattern Match</button>
-                </div>
-            </div>
+<a href="/" class="back-home">&larr; Home</a>
 
-            <div class="setup-section">
-                <h3>3. Select Timer</h3>
-                <div class="timer-grid" id="time-tabs">
-                    <button class="time-btn" data-time="120">2 Min</button>
-                    <button class="time-btn" data-time="180">3 Min</button>
-                    <button class="time-btn" data-time="300">5 Min</button>
-                </div>
-            </div>
+<!-- Home / Lobby -->
+<div id="screen-home" class="screen">
+  <div class="card home-card">
+    <div class="home-icon">&gt;_</div>
+    <h1 class="title">CodeCrack</h1>
+    <p class="subtitle">Test your coding knowledge against the clock</p>
 
-            <button id="start-btn" disabled>START CRACKING</button>
-        </div>
-
-        <!-- Arena -->
-        <div id="arena" class="hidden">
-            <div class="stats-bar">
-                <span>Time: <b id="timer-display">0:00</b></span>
-                <span>Score: <b id="score-display">0</b></span>
-            </div>
-            <p id="prompt-text"></p>
-            <pre id="code-block" class="hidden"></pre>
-            <div id="options-grid"></div>
-            <p id="explanation" class="hidden"></p>
-        </div>
-
-        <!-- Game Over -->
-        <div id="game-over" class="hidden">
-            <h2>Time's Up!</h2>
-            <p class="final-score">Score: <b id="over-score">0</b></p>
-            <p class="final-detail">Correct: <b id="over-correct">0</b> | Accuracy: <b id="over-accuracy">0%</b></p>
-            <button id="btn-play-again">Play Again</button>
-            <a href="/" class="back-link back-link-over">&larr; Back to Home</a>
-        </div>
+    <div class="setup-section">
+      <p class="section-label">Difficulty</p>
+      <div class="setup-buttons" id="diff-tabs">
+        <button class="btn setup-btn" data-diff="easy">Easy</button>
+        <button class="btn setup-btn" data-diff="medium">Medium</button>
+        <button class="btn setup-btn" data-diff="hard">Hard</button>
+      </div>
     </div>
 
-    <script src="app.js"></script>
+    <div class="setup-section">
+      <p class="section-label">Category</p>
+      <div class="setup-buttons" id="cat-tabs">
+        <button class="btn setup-btn" data-cat="bigO">Big O</button>
+        <button class="btn setup-btn" data-cat="bugspot">Bug Spot</button>
+        <button class="btn setup-btn" data-cat="pattern">Pattern</button>
+      </div>
+    </div>
+
+    <div class="setup-section">
+      <p class="section-label">Timer</p>
+      <div class="time-buttons" id="time-tabs">
+        <button class="btn btn-time" data-time="120">
+          <span class="time-val">2:00</span>
+          <span class="time-label">Sprint</span>
+        </button>
+        <button class="btn btn-time" data-time="180">
+          <span class="time-val">3:00</span>
+          <span class="time-label">Flow</span>
+        </button>
+        <button class="btn btn-time" data-time="300">
+          <span class="time-val">5:00</span>
+          <span class="time-label">Marathon</span>
+        </button>
+      </div>
+    </div>
+
+    <button id="start-btn" class="btn btn-primary" disabled>Start Cracking</button>
+  </div>
+</div>
+
+<!-- Game / Arena -->
+<div id="screen-game" class="screen hidden">
+  <div class="card game-card">
+    <div class="game-header">
+      <div class="stat">
+        <span class="stat-label">Score</span>
+        <span id="score-display" class="stat-value">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Correct</span>
+        <span id="correct-display" class="stat-value">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Streak</span>
+        <span id="streak-display" class="stat-value">0</span>
+      </div>
+    </div>
+
+    <div class="countdown-bar">
+      <div id="countdown-fill" class="countdown-fill"></div>
+    </div>
+    <span id="timer-display" class="countdown-text">0:00</span>
+
+    <p id="prompt-text" class="prompt-text"></p>
+    <pre id="code-block" class="code-block hidden"></pre>
+    <div id="options-grid" class="options-grid"></div>
+    <p id="explanation" class="explanation hidden"></p>
+  </div>
+</div>
+
+<!-- Game Over -->
+<div id="screen-over" class="screen hidden">
+  <div class="card over-card">
+    <div class="home-icon">&gt;_</div>
+    <h2 class="screen-title">Time's Up!</h2>
+
+    <div class="over-stats">
+      <div class="over-stat">
+        <span class="over-stat-value" id="over-score">0</span>
+        <span class="over-stat-label">Score</span>
+      </div>
+      <div class="over-stat">
+        <span class="over-stat-value" id="over-correct">0/0</span>
+        <span class="over-stat-label">Correct</span>
+      </div>
+      <div class="over-stat">
+        <span class="over-stat-value" id="over-accuracy">0%</span>
+        <span class="over-stat-label">Accuracy</span>
+      </div>
+    </div>
+
+    <button id="btn-play-again" class="btn btn-primary">Play Again</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script src="/feedback.js"></script>
+<script src="/consent.js"></script>
 </body>
 </html>
