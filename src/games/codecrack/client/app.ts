@@ -253,6 +253,24 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// Theme toggle
+const THEME_KEY = 'codecrack.theme';
+const themeToggle = $('theme-toggle');
+const themeIcon = $('theme-icon');
+
+function applyTheme(light: boolean) {
+  document.body.classList.toggle('theme-light', light);
+  themeIcon.innerHTML = light ? '&#x1F319;' : '&#x2600;&#xFE0F;';
+  localStorage.setItem(THEME_KEY, light ? 'light' : 'dark');
+}
+
+const savedTheme = localStorage.getItem(THEME_KEY);
+if (savedTheme === 'light') applyTheme(true);
+
+themeToggle.addEventListener('click', () => {
+  applyTheme(!document.body.classList.contains('theme-light'));
+});
+
 // Load questions
 fetch('data/questions.json')
   .then(r => r.json())
