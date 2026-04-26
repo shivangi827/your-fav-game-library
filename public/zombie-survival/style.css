@@ -1,4 +1,4 @@
-.back-home { position: fixed; top: 1rem; left: 1rem; z-index: 50; color: #666; text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color 0.2s; }
+.back-home { position: fixed; top: 1rem; left: 1rem; z-index: 50; color: #888; text-decoration: none; font-size: 0.95rem; font-weight: 700; transition: color 0.2s; }
 .back-home:hover { color: var(--toxic, #39FF14); }
 
 /* ── Tokens ────────────────────────────────────── */
