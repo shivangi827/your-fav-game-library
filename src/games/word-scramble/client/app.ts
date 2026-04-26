@@ -21,6 +21,7 @@ interface GameState {
   timerInterval: number | null;
   scrambled: string;
   hintRevealed: boolean;
+  playedWords: { word: string; solved: boolean }[];
 }
 
 const STORAGE_KEY = 'gramble.leaderboard';
@@ -344,6 +345,7 @@ function startGame(timeMode: TimeMode) {
     timerInterval: null,
     scrambled: '',
     hintRevealed: false,
+    playedWords: [],
   };
   applyModeTheme(activeGameMode);
   if (gameModeLabel) gameModeLabel.textContent = MODE_LABELS[activeGameMode];
@@ -441,6 +443,7 @@ function checkAnswer() {
     state.streak++;
     state.wordsCompleted++;
     if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+    state.playedWords.push({ word: word.word, solved: true });
 
     gameInput.disabled = true;
     gameFeedback.textContent = `+${points}`;
@@ -481,6 +484,7 @@ function revealHint() {
 function skipWord() {
   state.streak = 0;
   const word = state.words[state.currentIndex];
+  state.playedWords.push({ word: word.word, solved: false });
 
   gameInput.disabled = true;
   gameFeedback.textContent = word.word;
@@ -501,9 +505,30 @@ function updateUI() {
   gameWords.textContent = `${state.wordsCompleted}`;
 }
 
+function renderWordReview() {
+  const el = document.getElementById('word-review');
+  if (!el) return;
+  if (state.playedWords.length === 0) {
+    el.classList.add('hidden');
+    return;
+  }
+  el.classList.remove('hidden');
+  el.innerHTML = state.playedWords
+    .map(pw => `<span class="word-pill ${pw.solved ? 'word-pill-correct' : 'word-pill-wrong'}">${escapeHtml(pw.word)}</span>`)
+    .join('');
+}
+
 async function endGame() {
   stopTimer();
+
+  // Record the word currently on screen as unsolved if the player didn't get it
+  const currentWord = state.words[state.currentIndex];
+  if (currentWord && !state.playedWords.some(pw => pw.word === currentWord.word && pw.solved)) {
+    state.playedWords.push({ word: currentWord.word, solved: false });
+  }
+
   showScreen(screenOver);
+  renderWordReview();
 
   const playerName = getSavedName() || 'Anonymous';
 

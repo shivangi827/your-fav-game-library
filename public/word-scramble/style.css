@@ -1020,6 +1020,38 @@ body.mode-dev .modal-overlay {
 
 body.mode-dev ::-webkit-scrollbar-thumb { background: var(--surface-alt); }
 
+/* ── Word Review Pills ─────────────────────────── */
+.word-review {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 1.5px solid rgba(76, 175, 80, 0.12);
+  max-height: 180px;
+  overflow-y: auto;
+}
+.word-review.hidden { display: none; }
+.word-pill {
+  padding: 0.28rem 0.65rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+.word-pill-correct {
+  background: rgba(67, 160, 71, 0.14);
+  color: var(--correct);
+  border: 1px solid rgba(67, 160, 71, 0.28);
+}
+.word-pill-wrong {
+  background: rgba(198, 40, 40, 0.07);
+  color: var(--wrong);
+  border: 1px solid rgba(198, 40, 40, 0.18);
+  opacity: 0.75;
+}
+
 /* Mobile */
 @media (max-width: 500px) {
   .card { padding: 1.8rem 1.2rem; }
