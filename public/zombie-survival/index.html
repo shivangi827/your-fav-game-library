@@ -248,10 +248,12 @@
   var audio = document.getElementById('bg-music');
   var btn = document.getElementById('btn-music');
   var started = false;
+  var muted = localStorage.getItem('music.muted') === '1';
   audio.volume = 0.35;
+  if (muted) btn.innerHTML = '&#x1F507;';
 
   function tryPlay() {
-    if (started) return;
+    if (started || muted) return;
     audio.play().then(function() {
       started = true;
       btn.innerHTML = '&#x1F50A;';
@@ -265,9 +267,14 @@
     e.stopPropagation();
     if (audio.paused) {
       audio.play();
+      started = true;
+      muted = false;
+      localStorage.setItem('music.muted', '0');
       btn.innerHTML = '&#x1F50A;';
     } else {
       audio.pause();
+      muted = true;
+      localStorage.setItem('music.muted', '1');
       btn.innerHTML = '&#x1F507;';
     }
   });

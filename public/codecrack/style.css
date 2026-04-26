@@ -535,6 +535,31 @@ body.theme-light .explanation-wrong { color: #991B1B; }
   color: var(--text-muted);
 }
 
+/* ── Music toggle ──────────────────────────────── */
+.music-toggle {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1rem;
+  z-index: 50;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--accent);
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.music-toggle:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 12px var(--glow);
+}
+
 /* ── Scrollbar ─────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }

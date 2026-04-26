@@ -133,8 +133,48 @@
   </div>
 </div>
 
+<audio id="bg-music" src="music/Overclocked_Syntax.mp3" loop preload="auto"></audio>
+<button id="btn-music" class="music-toggle" title="Toggle music">&#x1F50A;</button>
+
 <script src="app.js"></script>
 <script src="/feedback.js"></script>
 <script src="/consent.js"></script>
+<script>
+(function() {
+  var audio = document.getElementById('bg-music');
+  var btn = document.getElementById('btn-music');
+  var started = false;
+  var muted = localStorage.getItem('music.muted') === '1';
+  audio.volume = 0.3;
+  if (muted) btn.innerHTML = '&#x1F507;';
+
+  function tryPlay() {
+    if (started || muted) return;
+    audio.play().then(function() {
+      started = true;
+      btn.innerHTML = '&#x1F50A;';
+    }).catch(function() {});
+  }
+
+  document.addEventListener('click', tryPlay, { once: false });
+  document.addEventListener('keydown', tryPlay, { once: false });
+
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (audio.paused) {
+      audio.play();
+      started = true;
+      muted = false;
+      localStorage.setItem('music.muted', '0');
+      btn.innerHTML = '&#x1F50A;';
+    } else {
+      audio.pause();
+      muted = true;
+      localStorage.setItem('music.muted', '1');
+      btn.innerHTML = '&#x1F507;';
+    }
+  });
+})();
+</script>
 </body>
 </html>

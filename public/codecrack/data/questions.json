@@ -1872,5 +1872,270 @@
 "options": ["O(1)", "O(log n)", "O(n)", "O(n^2)"],
 "answer": 2,
 "explanation": "You must swap elements from the outer edges inward, touching roughly n/2 elements, which is O(n)."
-}
+},
+  {
+    "type": "bigO",
+    "topic": "arrays",
+    "concept": "amortized-resize",
+    "difficulty": "medium",
+    "prompt": "What is the amortized time complexity of appending to a dynamic array?",
+    "options": ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+    "answer": 0,
+    "explanation": "Resizing happens occasionally, so average cost per append is constant."
+  },
+  {
+    "type": "bigO",
+    "topic": "recursion",
+    "concept": "stack-space",
+    "difficulty": "medium",
+    "prompt": "What is the space complexity of a recursive DFS on a skewed tree?",
+    "options": ["O(log n)", "O(n)", "O(1)", "O(n log n)"],
+    "answer": 1,
+    "explanation": "Skewed trees behave like linked lists, so recursion depth is n."
+  },
+  {
+    "type": "bigO",
+    "topic": "sorting",
+    "concept": "quick-sort-worst",
+    "difficulty": "medium",
+    "prompt": "Worst-case time complexity of quicksort?",
+    "options": ["O(n log n)", "O(n^2)", "O(log n)", "O(n)"],
+    "answer": 1,
+    "explanation": "Occurs when pivot partitions are unbalanced."
+  },
+  {
+    "type": "bigO",
+    "topic": "heaps",
+    "concept": "heapify-build",
+    "difficulty": "hard",
+    "prompt": "Time complexity of building a heap using heapify?",
+    "options": ["O(n)", "O(n log n)", "O(log n)", "O(n^2)"],
+    "answer": 0,
+    "explanation": "Heapify bottom-up runs in linear time."
+  },
+  {
+    "type": "bigO",
+    "topic": "graphs",
+    "concept": "dijkstra-complexity",
+    "difficulty": "hard",
+    "prompt": "Time complexity of Dijkstra using a min-heap?",
+    "options": ["O(V + E)", "O(E log V)", "O(V log V)", "O(E^2)"],
+    "answer": 1,
+    "explanation": "Each edge relaxation involves heap operations."
+  },
+  {
+    "type": "bigO",
+    "topic": "arrays",
+    "difficulty": "easy",
+    "prompt": "What is the time complexity of accessing an element in an array by index?",
+    "options": ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+    "answer": 0,
+    "explanation": "Arrays allow constant-time access using indices."
+  },
+  {
+    "type": "bigO",
+    "topic": "linked-lists",
+    "difficulty": "easy",
+    "prompt": "What is the time complexity of searching for a value in a singly linked list?",
+    "options": ["O(1)", "O(log n)", "O(n)", "O(n^2)"],
+    "answer": 2,
+    "explanation": "You must traverse nodes sequentially."
+  },
+  {
+    "type": "bigO",
+    "topic": "hashmaps",
+    "difficulty": "medium",
+    "prompt": "Average time complexity of inserting into a hashmap?",
+    "options": ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+    "answer": 0,
+    "explanation": "Hashmaps provide constant average-time operations."
+  },
+  {
+    "type": "bigO",
+    "topic": "hashmaps",
+    "difficulty": "medium",
+    "prompt": "Worst-case lookup time in a hashmap?",
+    "options": ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+    "answer": 2,
+    "explanation": "Collisions can degrade performance to linear time."
+  },
+  {
+    "type": "bigO",
+    "topic": "sorting",
+    "difficulty": "easy",
+    "prompt": "Time complexity of merge sort?",
+    "options": ["O(n)", "O(n log n)", "O(n^2)", "O(log n)"],
+    "answer": 1,
+    "explanation": "Merge sort divides and merges, resulting in n log n complexity."
+  },
+
+  {
+    "type": "pattern",
+    "topic": "arrays",
+    "difficulty": "easy",
+    "prompt": "Problem: 'Find two numbers that sum to target.' Best pattern?",
+    "options": ["Sliding window", "Hashmap", "DFS", "Heap"],
+    "answer": 1,
+    "explanation": "Hashmap helps store complements efficiently."
+  },
+  {
+    "type": "pattern",
+    "topic": "strings",
+    "difficulty": "medium",
+    "prompt": "Problem: 'Longest substring without repeating characters.' Pattern?",
+    "options": ["Sliding window", "DFS", "Binary search", "Heap"],
+    "answer": 0,
+    "explanation": "Sliding window tracks unique characters efficiently."
+  },
+  {
+    "type": "pattern",
+    "topic": "trees",
+    "difficulty": "easy",
+    "prompt": "Problem: 'Traverse all nodes in a tree.' Pattern?",
+    "options": ["Binary search", "DFS/BFS", "Greedy", "Heap"],
+    "answer": 1,
+    "explanation": "DFS and BFS are standard tree traversal methods."
+  },
+  {
+    "type": "pattern",
+    "topic": "graphs",
+    "difficulty": "medium",
+    "prompt": "Problem: 'Detect cycle in graph.' Pattern?",
+    "options": ["DFS", "Heap", "Binary search", "Two pointers"],
+    "answer": 0,
+    "explanation": "DFS with visited tracking detects cycles."
+  },
+  {
+    "type": "pattern",
+    "topic": "dp",
+    "difficulty": "medium",
+    "prompt": "Problem: 'Maximum subarray sum.' Pattern?",
+    "options": ["Greedy/Kadane", "DFS", "Heap", "Backtracking"],
+    "answer": 0,
+    "explanation": "Kadane’s algorithm solves it efficiently."
+  },
+
+  {
+    "type": "bugspot",
+    "topic": "python-lists",
+    "difficulty": "easy",
+    "prompt": "What does list.append([1,2]) do?",
+    "options": ["Adds two elements", "Adds a nested list", "Throws error", "Flattens list"],
+    "answer": 1,
+    "explanation": "append adds the entire object as a single element."
+  },
+  {
+    "type": "bugspot",
+    "topic": "python-sets",
+    "difficulty": "easy",
+    "prompt": "What happens when adding duplicate values to a set?",
+    "options": ["Error", "Duplicates stored", "Ignored", "Sorted automatically"],
+    "answer": 2,
+    "explanation": "Sets only store unique values."
+  },
+  {
+    "type": "bugspot",
+    "topic": "python-strings",
+    "difficulty": "medium",
+    "prompt": "Are Python strings mutable?",
+    "options": ["Yes", "No", "Sometimes", "Depends on size"],
+    "answer": 1,
+    "explanation": "Strings are immutable in Python."
+  },
+  {
+    "type": "bugspot",
+    "topic": "python-dicts",
+    "difficulty": "medium",
+    "prompt": "What happens when accessing a missing key with d['x']?",
+    "options": ["Returns None", "Returns 0", "KeyError", "False"],
+    "answer": 2,
+    "explanation": "Direct access raises a KeyError."
+  },
+
+  {
+    "type": "bigO",
+    "topic": "trees",
+    "difficulty": "medium",
+    "prompt": "Time complexity of inserting into a balanced BST?",
+    "options": ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+    "answer": 1,
+    "explanation": "Balanced BST ensures logarithmic depth."
+  },
+  {
+    "type": "bigO",
+    "topic": "heaps",
+    "difficulty": "medium",
+    "prompt": "Time complexity of inserting into a heap?",
+    "options": ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+    "answer": 1,
+    "explanation": "Heap insert requires bubbling up."
+  },
+  {
+    "type": "bigO",
+    "topic": "graphs",
+    "difficulty": "medium",
+    "prompt": "DFS time complexity for graph with V vertices and E edges?",
+    "options": ["O(V+E)", "O(V^2)", "O(E log V)", "O(V log E)"],
+    "answer": 0,
+    "explanation": "Each vertex and edge is visited once."
+  },
+
+  {
+    "type": "pattern",
+    "topic": "heaps",
+    "difficulty": "medium",
+    "prompt": "Problem: 'Find kth largest element.' Pattern?",
+    "options": ["Heap", "DFS", "Binary search", "Sliding window"],
+    "answer": 0,
+    "explanation": "Heap efficiently tracks top k elements."
+  },
+  {
+    "type": "pattern",
+    "topic": "intervals",
+    "difficulty": "medium",
+    "prompt": "Problem: 'Merge overlapping intervals.' Pattern?",
+    "options": ["Sorting + merging", "DFS", "Heap", "Backtracking"],
+    "answer": 0,
+    "explanation": "Sort intervals first, then merge."
+  },
+
+  {
+    "type": "bugspot",
+    "topic": "python-loops",
+    "difficulty": "easy",
+    "prompt": "What does range(5) generate?",
+    "options": ["1 to 5", "0 to 5", "0 to 4", "1 to 4"],
+    "answer": 2,
+    "explanation": "range(5) generates 0 through 4."
+  },
+
+  {
+    "type": "bigO",
+    "topic": "recursion",
+    "difficulty": "medium",
+    "prompt": "Time complexity of naive Fibonacci recursion?",
+    "options": ["O(n)", "O(log n)", "O(2^n)", "O(n log n)"],
+    "answer": 2,
+    "explanation": "Each call branches into two recursive calls."
+  },
+
+  {
+    "type": "pattern",
+    "topic": "backtracking",
+    "difficulty": "medium",
+    "prompt": "Problem: 'Generate all permutations.' Pattern?",
+    "options": ["Backtracking", "Greedy", "Heap", "Binary search"],
+    "answer": 0,
+    "explanation": "Backtracking explores all combinations."
+  },
+
+  {
+    "type": "bugspot",
+    "topic": "python-functions",
+    "difficulty": "medium",
+    "prompt": "What is returned if a Python function has no return statement?",
+    "options": ["0", "None", "False", "Error"],
+    "answer": 1,
+    "explanation": "Python returns None by default."
+  }
 ]
