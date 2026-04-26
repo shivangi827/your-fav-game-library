@@ -4,6 +4,9 @@
   padding: 0;
 }
 
+.back-home { position: fixed; top: 1rem; left: 1rem; z-index: 50; color: var(--text-light, #888); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color 0.2s; }
+.back-home:hover { color: var(--text, #333); }
+
 :root {
   --bg: #E8F5E9;
   --bg-deep: #C8E6C9;

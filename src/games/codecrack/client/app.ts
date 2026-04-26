@@ -1,40 +1,49 @@
-import { Question, Difficulty, DIFFICULTY_LABELS, DIFFICULTY_POINTS, TYPE_LABELS } from '../shared/types';
-import { questions } from '../shared/questions';
+interface Question {
+  type: string;
+  topic: string;
+  difficulty: string;
+  prompt: string;
+  code?: string;
+  options: string[];
+  answer: number;
+  explanation: string;
+}
 
+type Difficulty = 'easy' | 'medium' | 'hard';
+type Category = 'bigO' | 'bugspot' | 'pattern';
 type TimeMode = 120 | 180 | 300;
 
-interface LeaderboardEntry {
-  name: string;
-  score: number;
-  correct: number;
-  total: number;
-  streak: number;
-  date: string;
-}
+const POINTS: Record<string, number> = { easy: 100, medium: 200, hard: 300 };
 
-interface GameState {
-  difficulty: Difficulty;
-  timeMode: TimeMode;
-  questions: Question[];
-  currentIndex: number;
-  score: number;
-  streak: number;
-  bestStreak: number;
-  correct: number;
-  total: number;
-  timeLeft: number;
-  timerInterval: number | null;
-  answered: boolean;
-}
+let allQuestions: Question[] = [];
+let selectedDifficulty: Difficulty | null = null;
+let selectedCategory: Category | null = null;
+let selectedTime: TimeMode | null = null;
 
-const STORAGE_KEY = 'codecrack.leaderboard';
-const NAME_KEY = 'codecrack.name';
-const MAX_ENTRIES = 10;
-let useApi = false;
+let pool: Question[] = [];
+let idx = 0;
+let score = 0;
+let correct = 0;
+let total = 0;
+let timeLeft = 0;
+let timer: number | null = null;
+let answered = false;
 
-let activeDifficulty: Difficulty = 'easy';
-let activeLbTab: TimeMode = 120;
-let state: GameState;
+const $ = (id: string) => document.getElementById(id)!;
+const lobby = $('lobby');
+const arena = $('arena');
+const gameOver = $('game-over');
+const startBtn = $('start-btn') as HTMLButtonElement;
+const timerDisplay = $('timer-display');
+const scoreDisplay = $('score-display');
+const promptText = $('prompt-text');
+const codeBlock = $('code-block');
+const optionsGrid = $('options-grid');
+const explanationEl = $('explanation');
+const overScore = $('over-score');
+const overCorrect = $('over-correct');
+const overAccuracy = $('over-accuracy');
+const btnPlayAgain = $('btn-play-again');
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -45,137 +54,6 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-function getPool(diff: Difficulty): Question[] {
-  return shuffle(questions.filter(q => q.difficulty === diff));
-}
-
-function getSavedName(): string {
-  return localStorage.getItem(NAME_KEY) || '';
-}
-
-function saveName(name: string) {
-  localStorage.setItem(NAME_KEY, name);
-}
-
-function lbKey(diff: Difficulty, time: TimeMode): string {
-  return `${diff}-${time}`;
-}
-
-function getLocalScores(diff: Difficulty, time: TimeMode): LeaderboardEntry[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const lb = JSON.parse(raw);
-      return lb[lbKey(diff, time)] || [];
-    }
-  } catch { /* ignore */ }
-  return [];
-}
-
-function addLocalScore(diff: Difficulty, time: TimeMode, entry: LeaderboardEntry) {
-  let lb: Record<string, LeaderboardEntry[]>;
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    lb = raw ? JSON.parse(raw) : {};
-  } catch {
-    lb = {};
-  }
-  const key = lbKey(diff, time);
-  if (!lb[key]) lb[key] = [];
-  lb[key].push(entry);
-  lb[key].sort((a, b) => b.score - a.score);
-  lb[key] = lb[key].slice(0, MAX_ENTRIES);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(lb));
-}
-
-function cacheScores(diff: Difficulty, time: TimeMode, scores: LeaderboardEntry[]) {
-  let lb: Record<string, LeaderboardEntry[]>;
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    lb = raw ? JSON.parse(raw) : {};
-  } catch {
-    lb = {};
-  }
-  lb[lbKey(diff, time)] = scores.slice(0, MAX_ENTRIES);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(lb));
-}
-
-async function checkApi() {
-  try {
-    const res = await fetch('/api/codecrack/configured');
-    const data = await res.json();
-    useApi = data.configured === true;
-  } catch {
-    useApi = false;
-  }
-}
-
-async function fetchScores(diff: Difficulty, time: TimeMode): Promise<LeaderboardEntry[]> {
-  if (!useApi) return getLocalScores(diff, time);
-  try {
-    const res = await fetch(`/api/codecrack/scores/${diff}/${time}`);
-    if (!res.ok) return getLocalScores(diff, time);
-    const scores: LeaderboardEntry[] = await res.json();
-    cacheScores(diff, time, scores);
-    return scores;
-  } catch {
-    return getLocalScores(diff, time);
-  }
-}
-
-async function submitScore(diff: Difficulty, time: TimeMode, entry: LeaderboardEntry): Promise<void> {
-  addLocalScore(diff, time, entry);
-  if (!useApi) return;
-  try {
-    await fetch('/api/codecrack/scores', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ difficulty: diff, timeMode: time, ...entry }),
-    });
-  } catch { /* saved locally at least */ }
-}
-
-const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
-
-const screenHome = $('screen-home');
-const screenGame = $('screen-game');
-const screenOver = $('screen-over');
-
-const diffBtns = document.querySelectorAll<HTMLButtonElement>('.diff-btn');
-const btn120 = $('btn-120');
-const btn180 = $('btn-180');
-const btn300 = $('btn-300');
-
-const homeTabs = document.querySelectorAll<HTMLButtonElement>('.lb-tab');
-const homeLbList = $('home-lb-list');
-const homeLbEmpty = $('home-lb-empty');
-
-const gameCountdown = $('game-countdown');
-const countdownFill = $('countdown-fill');
-const gameScore = $('game-score');
-const gameStreak = $('game-streak');
-const gameCorrect = $('game-correct');
-const gameDiffLabel = $('game-diff-label');
-
-const qType = $('question-type');
-const qPrompt = $('question-prompt');
-const codeBlock = $('code-block');
-const codeContent = $('code-content');
-const optionBtns = document.querySelectorAll<HTMLButtonElement>('.option-btn');
-const explanationEl = $('explanation');
-
-const modalName = $('modal-name');
-const nameInput = $<HTMLInputElement>('input-name');
-const btnNameConfirm = $('btn-name-confirm');
-
-const overScore = $('over-score');
-const overCorrect = $('over-correct');
-const overAccuracy = $('over-accuracy');
-const overStreak = $('over-streak');
-const overNewBest = $('over-new-best');
-const overLbList = $('over-lb-list');
-const btnPlayAgain = $('btn-play-again');
-
 function escapeHtml(s: string): string {
   const d = document.createElement('div');
   d.textContent = s;
@@ -183,256 +61,176 @@ function escapeHtml(s: string): string {
 }
 
 function showScreen(screen: HTMLElement) {
-  [screenHome, screenGame, screenOver].forEach(s => s.classList.add('hidden'));
+  [lobby, arena, gameOver].forEach(s => s.classList.add('hidden'));
   screen.classList.remove('hidden');
 }
 
-function selectDifficulty(diff: Difficulty) {
-  activeDifficulty = diff;
-  diffBtns.forEach(b => b.classList.toggle('active', b.dataset.diff === diff));
-  renderHomeLb(activeLbTab);
+function updateStartBtn() {
+  startBtn.disabled = !(selectedDifficulty && selectedCategory && selectedTime);
 }
 
-function renderLbEntries(target: HTMLElement, scores: LeaderboardEntry[], highlight?: LeaderboardEntry) {
-  target.innerHTML = scores.map((s, i) => {
-    const isCurrent = highlight &&
-      s.score === highlight.score &&
-      s.correct === highlight.correct &&
-      s.name === highlight.name &&
-      s.date === highlight.date;
-    return `<li class="lb-entry ${i === 0 ? 'lb-gold' : ''} ${isCurrent ? 'lb-current' : ''}">
-      <span class="lb-rank">${i + 1}</span>
-      <span class="lb-name">${escapeHtml(s.name || 'Anonymous')}</span>
-      <span class="lb-score">${s.score}</span>
-      <span class="lb-detail">${s.correct}/${s.total}</span>
-      <span class="lb-date">${s.date}</span>
-    </li>`;
-  }).join('');
+function formatTime(secs: number): string {
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-async function renderHomeLb(time: TimeMode) {
-  activeLbTab = time;
-  homeTabs.forEach(tab => tab.classList.toggle('active', Number(tab.dataset.mode) === time));
-  const scores = await fetchScores(activeDifficulty, time);
-  if (scores.length === 0) {
-    homeLbList.innerHTML = '';
-    homeLbEmpty.classList.remove('hidden');
+// Difficulty buttons
+document.querySelectorAll<HTMLButtonElement>('#diff-tabs .tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#diff-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedDifficulty = btn.dataset.diff as Difficulty;
+    updateStartBtn();
+  });
+});
+
+// Category buttons
+document.querySelectorAll<HTMLButtonElement>('#cat-tabs .cat-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#cat-tabs .cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedCategory = btn.dataset.cat as Category;
+    updateStartBtn();
+  });
+});
+
+// Timer buttons
+document.querySelectorAll<HTMLButtonElement>('#time-tabs .time-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#time-tabs .time-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedTime = Number(btn.dataset.time) as TimeMode;
+    updateStartBtn();
+  });
+});
+
+// Start game
+startBtn.addEventListener('click', () => {
+  if (!selectedDifficulty || !selectedCategory || !selectedTime) return;
+
+  pool = shuffle(
+    allQuestions.filter(q => q.difficulty === selectedDifficulty && q.type === selectedCategory)
+  );
+
+  if (pool.length === 0) {
+    alert('No questions found for that combination. Try a different selection.');
     return;
   }
-  homeLbEmpty.classList.add('hidden');
-  renderLbEntries(homeLbList, scores);
-}
 
-function promptName(cb: () => void) {
-  const saved = getSavedName();
-  if (saved) nameInput.value = saved;
-  modalName.classList.remove('hidden');
-  nameInput.focus();
+  idx = 0;
+  score = 0;
+  correct = 0;
+  total = 0;
+  timeLeft = selectedTime;
+  answered = false;
 
-  function confirm() {
-    const name = nameInput.value.trim();
-    if (!name) return;
-    saveName(name);
-    modalName.classList.add('hidden');
-    btnNameConfirm.removeEventListener('click', confirm);
-    nameInput.removeEventListener('keydown', onKey);
-    cb();
-  }
-  function onKey(e: KeyboardEvent) { if (e.key === 'Enter') confirm(); }
-  btnNameConfirm.addEventListener('click', confirm);
-  nameInput.addEventListener('keydown', onKey);
-}
+  scoreDisplay.textContent = '0';
+  timerDisplay.textContent = formatTime(timeLeft);
 
-function startGame(timeMode: TimeMode) {
-  state = {
-    difficulty: activeDifficulty,
-    timeMode,
-    questions: getPool(activeDifficulty),
-    currentIndex: 0,
-    score: 0,
-    streak: 0,
-    bestStreak: 0,
-    correct: 0,
-    total: 0,
-    timeLeft: timeMode,
-    timerInterval: null,
-    answered: false,
-  };
-  if (gameDiffLabel) gameDiffLabel.textContent = DIFFICULTY_LABELS[activeDifficulty];
-  showScreen(screenGame);
+  showScreen(arena);
   loadQuestion();
-  startCountdown();
-}
 
-function handleTimeSelect(timeMode: TimeMode) {
-  const saved = getSavedName();
-  if (saved) startGame(timeMode);
-  else promptName(() => startGame(timeMode));
-}
+  timer = window.setInterval(() => {
+    timeLeft--;
+    timerDisplay.textContent = formatTime(timeLeft);
+    if (timeLeft <= 0) endGame();
+  }, 1000);
+});
 
 function loadQuestion() {
-  if (state.currentIndex >= state.questions.length) {
-    state.questions = shuffle([...state.questions]);
-    state.currentIndex = 0;
+  if (idx >= pool.length) {
+    pool = shuffle([...pool]);
+    idx = 0;
   }
 
-  const q = state.questions[state.currentIndex];
-  state.answered = false;
+  const q = pool[idx];
+  answered = false;
 
-  qType.textContent = TYPE_LABELS[q.type];
-  qType.className = `question-type type-${q.type}`;
-  qPrompt.textContent = q.prompt;
+  promptText.textContent = q.prompt;
 
   if (q.code) {
+    codeBlock.textContent = q.code;
     codeBlock.classList.remove('hidden');
-    codeContent.textContent = q.code;
   } else {
+    codeBlock.textContent = '';
     codeBlock.classList.add('hidden');
   }
 
-  const labels = ['A', 'B', 'C', 'D'];
-  optionBtns.forEach((btn, i) => {
-    btn.className = 'option-btn';
-    btn.disabled = false;
-    btn.innerHTML = `<span class="option-label">${labels[i]}</span><span class="option-text">${escapeHtml(q.options[i])}</span>`;
-  });
-
-  explanationEl.classList.add('hidden');
   explanationEl.textContent = '';
-  updateUI();
+  explanationEl.classList.add('hidden');
+
+  const labels = ['A', 'B', 'C', 'D'];
+  optionsGrid.innerHTML = q.options.map((opt, i) =>
+    `<button class="opt-btn" data-idx="${i}"><span class="opt-label">${labels[i]}</span> ${escapeHtml(opt)}</button>`
+  ).join('');
+
+  optionsGrid.querySelectorAll<HTMLButtonElement>('.opt-btn').forEach(btn => {
+    btn.addEventListener('click', () => selectAnswer(Number(btn.dataset.idx)));
+  });
 }
 
-function selectOption(index: number) {
-  if (!state || state.answered || !state.timerInterval) return;
-  state.answered = true;
-  state.total++;
+function selectAnswer(ansIdx: number) {
+  if (answered || timer === null) return;
+  answered = true;
+  total++;
 
-  const q = state.questions[state.currentIndex];
-  const isCorrect = index === q.answer;
+  const q = pool[idx];
+  const isCorrect = ansIdx === q.answer;
 
   if (isCorrect) {
-    const mult = 1 + Math.floor(state.streak / 3) * 0.25;
-    const pts = Math.round(DIFFICULTY_POINTS[q.difficulty] * mult);
-    state.score += pts;
-    state.streak++;
-    state.correct++;
-    if (state.streak > state.bestStreak) state.bestStreak = state.streak;
-  } else {
-    state.streak = 0;
+    score += POINTS[q.difficulty] || 100;
+    correct++;
   }
 
-  optionBtns.forEach((btn, i) => {
+  const btns = optionsGrid.querySelectorAll<HTMLButtonElement>('.opt-btn');
+  btns.forEach((btn, i) => {
     btn.disabled = true;
     if (i === q.answer) btn.classList.add('correct');
-    if (i === index && !isCorrect) btn.classList.add('wrong');
+    if (i === ansIdx && !isCorrect) btn.classList.add('wrong');
   });
 
   explanationEl.textContent = q.explanation;
   explanationEl.classList.remove('hidden');
   explanationEl.className = `explanation ${isCorrect ? 'explanation-correct' : 'explanation-wrong'}`;
-  updateUI();
+
+  scoreDisplay.textContent = String(score);
 
   setTimeout(() => {
-    if (!state.timerInterval) return;
-    state.currentIndex++;
+    if (timer === null) return;
+    idx++;
     loadQuestion();
-  }, isCorrect ? 1800 : 2500);
+  }, isCorrect ? 1200 : 2000);
 }
 
-function startCountdown() {
-  if (state.timerInterval) clearInterval(state.timerInterval);
-  const total = state.timeMode;
-  countdownFill.style.transition = 'none';
-  countdownFill.style.width = '100%';
-  void countdownFill.offsetWidth;
-  countdownFill.style.transition = 'width 1s linear';
-
-  state.timerInterval = window.setInterval(() => {
-    state.timeLeft--;
-    countdownFill.style.width = `${(state.timeLeft / total) * 100}%`;
-    countdownFill.classList.toggle('timer-danger', state.timeLeft <= 10);
-    const m = Math.floor(state.timeLeft / 60);
-    const s = state.timeLeft % 60;
-    gameCountdown.textContent = `${m}:${s.toString().padStart(2, '0')}`;
-    if (state.timeLeft <= 0) endGame();
-  }, 1000);
-
-  const m = Math.floor(state.timeLeft / 60);
-  const s = state.timeLeft % 60;
-  gameCountdown.textContent = `${m}:${s.toString().padStart(2, '0')}`;
-}
-
-async function endGame() {
-  if (state.timerInterval) {
-    clearInterval(state.timerInterval);
-    state.timerInterval = null;
+function endGame() {
+  if (timer !== null) {
+    clearInterval(timer);
+    timer = null;
   }
 
-  const name = getSavedName() || 'Anonymous';
-  const entry: LeaderboardEntry = {
-    name,
-    score: state.score,
-    correct: state.correct,
-    total: state.total,
-    streak: state.bestStreak,
-    date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-  };
+  overScore.textContent = String(score);
+  overCorrect.textContent = `${correct}/${total}`;
+  overAccuracy.textContent = total > 0 ? `${Math.round((correct / total) * 100)}%` : '0%';
 
-  const prev = await fetchScores(state.difficulty, state.timeMode);
-  const prevBest = prev.length > 0 ? prev[0].score : 0;
-  const isNewBest = state.score > prevBest && state.score > 0;
-
-  await submitScore(state.difficulty, state.timeMode, entry);
-
-  overScore.textContent = `${state.score}`;
-  overCorrect.textContent = `${state.correct}/${state.total}`;
-  overAccuracy.textContent = state.total > 0 ? `${Math.round((state.correct / state.total) * 100)}%` : '0%';
-  overStreak.textContent = `${state.bestStreak}`;
-  overNewBest.classList.toggle('hidden', !isNewBest);
-
-  const scores = await fetchScores(state.difficulty, state.timeMode);
-  renderLbEntries(overLbList, scores, entry);
-  showScreen(screenOver);
+  showScreen(gameOver);
 }
 
-function updateUI() {
-  gameScore.textContent = `${state.score}`;
-  gameStreak.textContent = `${state.streak}`;
-  gameCorrect.textContent = `${state.correct}`;
-}
+// Play again
+btnPlayAgain.addEventListener('click', () => showScreen(lobby));
 
-function isGameActive(): boolean {
-  return !!state && state.timerInterval !== null && !screenGame.classList.contains('hidden');
-}
-
+// Keyboard shortcuts 1-4
 document.addEventListener('keydown', (e) => {
-  if (!isGameActive() || state.answered) return;
+  if (arena.classList.contains('hidden') || answered) return;
   const key = parseInt(e.key);
   if (key >= 1 && key <= 4) {
     e.preventDefault();
-    selectOption(key - 1);
+    selectAnswer(key - 1);
   }
 });
 
-optionBtns.forEach((btn, i) => btn.addEventListener('click', () => selectOption(i)));
-
-btn120.addEventListener('click', () => handleTimeSelect(120));
-btn180.addEventListener('click', () => handleTimeSelect(180));
-btn300.addEventListener('click', () => handleTimeSelect(300));
-
-btnPlayAgain.addEventListener('click', () => {
-  renderHomeLb(activeLbTab);
-  showScreen(screenHome);
-});
-
-homeTabs.forEach(tab => {
-  tab.addEventListener('click', () => renderHomeLb(Number(tab.dataset.mode) as TimeMode));
-});
-
-diffBtns.forEach(btn => {
-  btn.addEventListener('click', () => selectDifficulty(btn.dataset.diff as Difficulty));
-});
-
-checkApi().then(() => {
-  selectDifficulty('easy');
-});
+// Load questions
+fetch('data/questions.json')
+  .then(r => r.json())
+  .then((data: Question[]) => { allQuestions = data; })
+  .catch(err => console.error('Failed to load questions:', err));

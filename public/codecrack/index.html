@@ -3,52 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CodeCrack Pro</title>
+    <title>CodeCrack</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="game-container">
+        <!-- Lobby -->
         <div id="lobby">
+            <a href="/" class="back-link">&larr; Home</a>
             <h1>CODECRACK</h1>
-            
+
             <div class="setup-section">
                 <h3>1. Select Difficulty</h3>
-                <div class="tabs">
-                    <button class="tab-btn active" onclick="setDifficulty('easy')">Easy</button>
-                    <button class="tab-btn" onclick="setDifficulty('medium')">Medium</button>
-                    <button class="tab-btn" onclick="setDifficulty('hard')">Hard</button>
+                <div class="tabs" id="diff-tabs">
+                    <button class="tab-btn" data-diff="easy">Easy</button>
+                    <button class="tab-btn" data-diff="medium">Medium</button>
+                    <button class="tab-btn" data-diff="hard">Hard</button>
                 </div>
             </div>
 
             <div class="setup-section">
                 <h3>2. Select Category</h3>
-                <div class="category-grid">
-                    <button class="cat-btn" onclick="setCategory('bigO')">Time Complexity</button>
-                    <button class="cat-btn" onclick="setCategory('bugspot')">Bug Spotting</button>
-                    <button class="cat-btn" onclick="setCategory('pattern')">Pattern Match</button>
+                <div class="category-grid" id="cat-tabs">
+                    <button class="cat-btn" data-cat="bigO">Time Complexity</button>
+                    <button class="cat-btn" data-cat="bugspot">Bug Spotting</button>
+                    <button class="cat-btn" data-cat="pattern">Pattern Match</button>
                 </div>
             </div>
 
             <div class="setup-section">
                 <h3>3. Select Timer</h3>
-                <div class="timer-grid">
-                    <button class="time-btn" onclick="setTimer(120)">2 Min</button>
-                    <button class="time-btn" onclick="setTimer(180)">3 Min</button>
-                    <button class="time-btn" onclick="setTimer(300)">5 Min</button>
+                <div class="timer-grid" id="time-tabs">
+                    <button class="time-btn" data-time="120">2 Min</button>
+                    <button class="time-btn" data-time="180">3 Min</button>
+                    <button class="time-btn" data-time="300">5 Min</button>
                 </div>
             </div>
 
-            <button id="start-btn" onclick="startGame()" disabled>START CRACKING</button>
+            <button id="start-btn" disabled>START CRACKING</button>
         </div>
 
+        <!-- Arena -->
         <div id="arena" class="hidden">
             <div class="stats-bar">
                 <span>Time: <b id="timer-display">0:00</b></span>
                 <span>Score: <b id="score-display">0</b></span>
             </div>
             <p id="prompt-text"></p>
-            <pre id="code-block"></pre>
+            <pre id="code-block" class="hidden"></pre>
             <div id="options-grid"></div>
+            <p id="explanation" class="hidden"></p>
+        </div>
+
+        <!-- Game Over -->
+        <div id="game-over" class="hidden">
+            <h2>Time's Up!</h2>
+            <p class="final-score">Score: <b id="over-score">0</b></p>
+            <p class="final-detail">Correct: <b id="over-correct">0</b> | Accuracy: <b id="over-accuracy">0%</b></p>
+            <button id="btn-play-again">Play Again</button>
+            <a href="/" class="back-link back-link-over">&larr; Back to Home</a>
         </div>
     </div>
 

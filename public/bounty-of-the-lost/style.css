@@ -1,5 +1,8 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+.back-home { position: fixed; top: 1rem; left: 1rem; z-index: 50; color: #666; text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color 0.2s; }
+.back-home:hover { color: var(--accent, #8B5CF6); }
+
 :root {
   --bg: #0D0D12;
   --bg-secondary: #141420;
