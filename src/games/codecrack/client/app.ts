@@ -21,21 +21,26 @@ let selectedCategory: Category | null = null;
 let selectedTime: TimeMode | null = null;
 
 let pool: Question[] = [];
-let idx = 0;
+let qIdx = 0;
 let score = 0;
 let correct = 0;
+let streak = 0;
+let bestStreak = 0;
 let total = 0;
 let timeLeft = 0;
 let timer: number | null = null;
 let answered = false;
 
 const $ = (id: string) => document.getElementById(id)!;
-const lobby = $('lobby');
-const arena = $('arena');
-const gameOver = $('game-over');
+const screenHome = $('screen-home');
+const screenGame = $('screen-game');
+const screenOver = $('screen-over');
 const startBtn = $('start-btn') as HTMLButtonElement;
 const timerDisplay = $('timer-display');
 const scoreDisplay = $('score-display');
+const correctDisplay = $('correct-display');
+const streakDisplay = $('streak-display');
+const countdownFill = $('countdown-fill');
 const promptText = $('prompt-text');
 const codeBlock = $('code-block');
 const optionsGrid = $('options-grid');
@@ -61,7 +66,7 @@ function escapeHtml(s: string): string {
 }
 
 function showScreen(screen: HTMLElement) {
-  [lobby, arena, gameOver].forEach(s => s.classList.add('hidden'));
+  [screenHome, screenGame, screenOver].forEach(s => s.classList.add('hidden'));
   screen.classList.remove('hidden');
 }
 
@@ -76,9 +81,9 @@ function formatTime(secs: number): string {
 }
 
 // Difficulty buttons
-document.querySelectorAll<HTMLButtonElement>('#diff-tabs .tab-btn').forEach(btn => {
+document.querySelectorAll<HTMLButtonElement>('#diff-tabs .setup-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('#diff-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('#diff-tabs .setup-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     selectedDifficulty = btn.dataset.diff as Difficulty;
     updateStartBtn();
@@ -86,9 +91,9 @@ document.querySelectorAll<HTMLButtonElement>('#diff-tabs .tab-btn').forEach(btn 
 });
 
 // Category buttons
-document.querySelectorAll<HTMLButtonElement>('#cat-tabs .cat-btn').forEach(btn => {
+document.querySelectorAll<HTMLButtonElement>('#cat-tabs .setup-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('#cat-tabs .cat-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('#cat-tabs .setup-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     selectedCategory = btn.dataset.cat as Category;
     updateStartBtn();
@@ -96,9 +101,9 @@ document.querySelectorAll<HTMLButtonElement>('#cat-tabs .cat-btn').forEach(btn =
 });
 
 // Timer buttons
-document.querySelectorAll<HTMLButtonElement>('#time-tabs .time-btn').forEach(btn => {
+document.querySelectorAll<HTMLButtonElement>('#time-tabs .btn-time').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('#time-tabs .time-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('#time-tabs .btn-time').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     selectedTime = Number(btn.dataset.time) as TimeMode;
     updateStartBtn();
@@ -118,33 +123,45 @@ startBtn.addEventListener('click', () => {
     return;
   }
 
-  idx = 0;
+  qIdx = 0;
   score = 0;
   correct = 0;
+  streak = 0;
+  bestStreak = 0;
   total = 0;
   timeLeft = selectedTime;
   answered = false;
 
   scoreDisplay.textContent = '0';
+  correctDisplay.textContent = '0';
+  streakDisplay.textContent = '0';
   timerDisplay.textContent = formatTime(timeLeft);
 
-  showScreen(arena);
+  countdownFill.style.transition = 'none';
+  countdownFill.style.width = '100%';
+  void countdownFill.offsetWidth;
+  countdownFill.style.transition = 'width 1s linear';
+
+  showScreen(screenGame);
   loadQuestion();
 
+  const totalTime = selectedTime;
   timer = window.setInterval(() => {
     timeLeft--;
     timerDisplay.textContent = formatTime(timeLeft);
+    countdownFill.style.width = `${(timeLeft / totalTime) * 100}%`;
+    countdownFill.classList.toggle('timer-danger', timeLeft <= 10);
     if (timeLeft <= 0) endGame();
   }, 1000);
 });
 
 function loadQuestion() {
-  if (idx >= pool.length) {
+  if (qIdx >= pool.length) {
     pool = shuffle([...pool]);
-    idx = 0;
+    qIdx = 0;
   }
 
-  const q = pool[idx];
+  const q = pool[qIdx];
   answered = false;
 
   promptText.textContent = q.prompt;
@@ -162,7 +179,7 @@ function loadQuestion() {
 
   const labels = ['A', 'B', 'C', 'D'];
   optionsGrid.innerHTML = q.options.map((opt, i) =>
-    `<button class="opt-btn" data-idx="${i}"><span class="opt-label">${labels[i]}</span> ${escapeHtml(opt)}</button>`
+    `<button class="opt-btn" data-idx="${i}"><span class="opt-label">${labels[i]}</span>${escapeHtml(opt)}</button>`
   ).join('');
 
   optionsGrid.querySelectorAll<HTMLButtonElement>('.opt-btn').forEach(btn => {
@@ -175,12 +192,17 @@ function selectAnswer(ansIdx: number) {
   answered = true;
   total++;
 
-  const q = pool[idx];
+  const q = pool[qIdx];
   const isCorrect = ansIdx === q.answer;
 
   if (isCorrect) {
-    score += POINTS[q.difficulty] || 100;
+    const mult = 1 + Math.floor(streak / 3) * 0.25;
+    score += Math.round((POINTS[q.difficulty] || 100) * mult);
     correct++;
+    streak++;
+    if (streak > bestStreak) bestStreak = streak;
+  } else {
+    streak = 0;
   }
 
   const btns = optionsGrid.querySelectorAll<HTMLButtonElement>('.opt-btn');
@@ -195,12 +217,14 @@ function selectAnswer(ansIdx: number) {
   explanationEl.className = `explanation ${isCorrect ? 'explanation-correct' : 'explanation-wrong'}`;
 
   scoreDisplay.textContent = String(score);
+  correctDisplay.textContent = String(correct);
+  streakDisplay.textContent = String(streak);
 
   setTimeout(() => {
     if (timer === null) return;
-    idx++;
+    qIdx++;
     loadQuestion();
-  }, isCorrect ? 1200 : 2000);
+  }, isCorrect ? 1500 : 2200);
 }
 
 function endGame() {
@@ -213,15 +237,15 @@ function endGame() {
   overCorrect.textContent = `${correct}/${total}`;
   overAccuracy.textContent = total > 0 ? `${Math.round((correct / total) * 100)}%` : '0%';
 
-  showScreen(gameOver);
+  showScreen(screenOver);
 }
 
 // Play again
-btnPlayAgain.addEventListener('click', () => showScreen(lobby));
+btnPlayAgain.addEventListener('click', () => showScreen(screenHome));
 
 // Keyboard shortcuts 1-4
 document.addEventListener('keydown', (e) => {
-  if (arena.classList.contains('hidden') || answered) return;
+  if (screenGame.classList.contains('hidden') || answered) return;
   const key = parseInt(e.key);
   if (key >= 1 && key <= 4) {
     e.preventDefault();
