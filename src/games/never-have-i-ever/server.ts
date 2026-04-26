@@ -8,6 +8,7 @@ import {
   GameSnapshot,
 } from './shared/types';
 import { PROMPTS } from './shared/prompts';
+import posthog from '../../posthog';
 
 interface Player {
   id: string;
@@ -208,6 +209,16 @@ export function setupNeverHaveIEver(ns: Namespace): void {
       currentRoom.currentPrompt = pickPrompt(currentRoom);
       for (const p of currentRoom.players) p.answer = null;
       broadcastState(currentRoom);
+      posthog.capture({
+        distinctId: socket.id,
+        event: 'game started',
+        properties: {
+          game: 'never-have-i-ever',
+          room_code: currentRoom.code,
+          player_count: currentRoom.players.length,
+          total_rounds: currentRoom.totalRounds,
+        },
+      });
     });
 
     socket.on('submit-answer', (iHave: boolean) => {
@@ -241,6 +252,16 @@ export function setupNeverHaveIEver(ns: Namespace): void {
       if (currentRoom.currentRound >= currentRoom.totalRounds) {
         currentRoom.state = 'finished';
         broadcastState(currentRoom);
+        posthog.capture({
+          distinctId: socket.id,
+          event: 'game completed',
+          properties: {
+            game: 'never-have-i-ever',
+            room_code: currentRoom.code,
+            player_count: currentRoom.players.length,
+            total_rounds: currentRoom.totalRounds,
+          },
+        });
         return;
       }
 

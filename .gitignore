@@ -14,3 +14,4 @@ public/bounty-of-the-lost/app.js
 public/bounty-of-the-lost/app.js.map
 *.pdf
 .DS_Store
+.env

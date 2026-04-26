@@ -14,6 +14,7 @@ import {
   MAX_ROOMS,
 } from './shared/types';
 import { WORD_LIST } from './shared/words';
+import posthog from '../../posthog';
 
 interface Player {
   id: string;
@@ -181,6 +182,11 @@ export function setupImposter(rawNs: Namespace): void {
         state: 'lobby',
         settings: room.settings,
       });
+      posthog.capture({
+        distinctId: socket.id,
+        event: 'room created',
+        properties: { game: 'imposter', room_code: code, num_imposters: numImposters },
+      });
     });
 
     socket.on('join-room', ({ code, playerName }) => {
@@ -293,6 +299,16 @@ export function setupImposter(rawNs: Namespace): void {
         round: 0,
         hostId: room.hostId,
         players: room.players.map(safePlayer),
+      });
+      posthog.capture({
+        distinctId: socket.id,
+        event: 'game started',
+        properties: {
+          game: 'imposter',
+          room_code: room.code,
+          player_count: room.players.length,
+          num_imposters: numImposters,
+        },
       });
     });
 
@@ -432,6 +448,17 @@ export function setupImposter(rawNs: Namespace): void {
         imposterGuessCorrect: correct,
         imposterGuess: trimmed,
         players: room.players.map(safePlayer),
+      });
+      posthog.capture({
+        distinctId: socket.id,
+        event: 'game completed',
+        properties: {
+          game: 'imposter',
+          room_code: room.code,
+          player_count: room.players.length,
+          imposter_caught: room.lastCaught,
+          imposter_guess_correct: correct,
+        },
       });
     });
 

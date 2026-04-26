@@ -8,6 +8,7 @@ import {
   GameSnapshot,
 } from './shared/types';
 import { PROMPTS } from './shared/prompts';
+import posthog from '../../posthog';
 
 interface Player {
   id: string;
@@ -168,6 +169,11 @@ export function setupVibeCheck(ns: Namespace): void {
       socket.join(code);
       socket.emit('room-created', code);
       broadcastState(room);
+      posthog.capture({
+        distinctId: socket.id,
+        event: 'room created',
+        properties: { game: 'vibe-check', room_code: code },
+      });
     });
 
     socket.on('join-room', (data: { code: string; name: string }) => {
@@ -230,6 +236,16 @@ export function setupVibeCheck(ns: Namespace): void {
       currentRoom.currentPrompt = pickPrompt(currentRoom);
       for (const p of currentRoom.players) p.answer = null;
       broadcastState(currentRoom);
+      posthog.capture({
+        distinctId: socket.id,
+        event: 'game started',
+        properties: {
+          game: 'vibe-check',
+          room_code: currentRoom.code,
+          player_count: currentRoom.players.length,
+          total_rounds: currentRoom.totalRounds,
+        },
+      });
     });
 
     socket.on('submit-answer', (answer: number) => {
@@ -264,6 +280,16 @@ export function setupVibeCheck(ns: Namespace): void {
       if (currentRoom.currentRound >= currentRoom.totalRounds) {
         currentRoom.state = 'finished';
         broadcastState(currentRoom);
+        posthog.capture({
+          distinctId: socket.id,
+          event: 'game completed',
+          properties: {
+            game: 'vibe-check',
+            room_code: currentRoom.code,
+            player_count: currentRoom.players.length,
+            total_rounds: currentRoom.totalRounds,
+          },
+        });
         return;
       }
 

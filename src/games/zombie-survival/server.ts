@@ -10,6 +10,7 @@ import {
   Scenario,
 } from './shared/types';
 import { SCENARIOS } from './shared/prompts';
+import posthog from '../../posthog';
 
 interface Player {
   id: string;
@@ -208,6 +209,20 @@ export function setupZombieSurvival(rawNs: Namespace): void {
       room.state = 'finished';
     }
 
+    if (room.state === 'finished') {
+      posthog.capture({
+        distinctId: room.hostId,
+        event: 'game completed',
+        properties: {
+          game: 'zombie-survival',
+          room_code: room.code,
+          player_count: room.players.length,
+          winner: room.winner,
+          rounds_played: room.currentRound,
+        },
+      });
+    }
+
     broadcastState(room);
   }
 
@@ -346,6 +361,16 @@ export function setupZombieSurvival(rawNs: Namespace): void {
       room.currentRound = 1;
       room.lastActivity = Date.now();
       startVoting(room);
+      posthog.capture({
+        distinctId: socket.id,
+        event: 'game started',
+        properties: {
+          game: 'zombie-survival',
+          room_code: room.code,
+          player_count: room.players.length,
+          total_rounds: room.totalRounds,
+        },
+      });
     });
 
     socket.on('submit-vote', (choice: 'A' | 'B') => {

@@ -10,6 +10,7 @@ import { getScores, addScore, isConfigured, ScoreEntry } from './games/word-scra
 import { getCodeCrackScores, addCodeCrackScore, CodeCrackScoreEntry } from './games/codecrack/sheets';
 import { addFeedback, FeedbackEntry } from './feedback-sheets';
 import { sendFeedbackEmail } from './feedback-email';
+import posthog from './posthog';
 
 const app = express();
 const server = http.createServer(app);
@@ -84,6 +85,18 @@ app.post('/api/gramble/scores', express.json(), async (req, res) => {
     streak: Math.max(0, Math.round(streak)),
     date: String(date).slice(0, 20),
   });
+  posthog.capture({
+    distinctId: sanitizedName,
+    event: 'score submitted',
+    properties: {
+      game: 'gramble',
+      game_mode: gameMode,
+      time_mode: timeMode,
+      score: Math.max(0, Math.round(score)),
+      words: Math.max(0, Math.round(words)),
+      streak: Math.max(0, Math.round(streak)),
+    },
+  });
   res.json({ ok });
 });
 
@@ -128,6 +141,19 @@ app.post('/api/codecrack/scores', express.json(), async (req, res) => {
     streak: Math.max(0, Math.round(streak)),
     date: String(date).slice(0, 20),
   });
+  posthog.capture({
+    distinctId: sanitizedName,
+    event: 'score submitted',
+    properties: {
+      game: 'codecrack',
+      difficulty,
+      time_mode: timeMode,
+      score: Math.max(0, Math.round(score)),
+      correct: Math.max(0, Math.round(correct)),
+      total: Math.max(0, Math.round(total)),
+      streak: Math.max(0, Math.round(streak)),
+    },
+  });
   res.json({ ok });
 });
 
@@ -147,6 +173,15 @@ app.post('/api/feedback', express.json(), async (req, res) => {
     addFeedback(entry),
     sendFeedbackEmail(entry),
   ]);
+  posthog.capture({
+    distinctId: `anonymous_feedback`,
+    event: 'feedback submitted',
+    properties: {
+      rating: entry.rating,
+      page: entry.page,
+      has_message: entry.message.length > 0,
+    },
+  });
   res.json({ ok });
 });
 
@@ -154,6 +189,11 @@ setupImposter(io.of('/imposter'));
 setupVibeCheck(io.of('/vibe-check'));
 setupNeverHaveIEver(io.of('/never-have-i-ever'));
 setupZombieSurvival(io.of('/zombie-survival'));
+
+app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  posthog.captureException(err instanceof Error ? err : new Error(String(err)));
+  res.status(500).json({ error: 'Internal server error' });
+});
 
 const PORT = Number(process.env.PORT) || 3000;
 server.listen(PORT, () => {
