@@ -9,16 +9,25 @@ interface Question {
   explanation: string;
 }
 
-type Difficulty = 'easy' | 'medium' | 'hard';
+interface LeaderboardEntry {
+  name: string;
+  score: number;
+  correct: number;
+  total: number;
+  streak: number;
+}
+
 type Category = 'bigO' | 'bugspot' | 'pattern';
-type TimeMode = 120 | 180 | 300;
+type TimeMode = 60 | 120 | 180;
 
 const POINTS: Record<string, number> = { easy: 100, medium: 200, hard: 300 };
+const DIFF_LABEL: Record<string, string> = { easy: '1× pts', medium: '2× pts', hard: '3× pts' };
+const DIFF_CLASS: Record<string, string> = { easy: 'badge-easy', medium: 'badge-medium', hard: 'badge-hard' };
 
 let allQuestions: Question[] = [];
-let selectedDifficulty: Difficulty | null = null;
 let selectedCategory: Category | null = null;
 let selectedTime: TimeMode | null = null;
+let activeLbTab: TimeMode = 60;
 
 let pool: Question[] = [];
 let seen: Set<number> = new Set();
@@ -43,14 +52,26 @@ const scoreDisplay = $('score-display');
 const correctDisplay = $('correct-display');
 const streakDisplay = $('streak-display');
 const countdownFill = $('countdown-fill');
+const diffBadge = $('diff-badge');
 const promptText = $('prompt-text');
 const codeBlock = $('code-block');
 const optionsGrid = $('options-grid');
 const explanationEl = $('explanation');
+const btnSkip = $('btn-skip') as HTMLButtonElement;
 const overScore = $('over-score');
 const overCorrect = $('over-correct');
 const overAccuracy = $('over-accuracy');
 const btnPlayAgain = $('btn-play-again');
+const homeLbList = $('home-lb-list');
+const homeLbEmpty = $('home-lb-empty');
+const overLbList = $('over-lb-list');
+const overLbEmpty = $('over-lb-empty');
+const modalName = $('modal-name');
+const inputName = $('input-name') as HTMLInputElement;
+const btnNameConfirm = $('btn-name-confirm') as HTMLButtonElement;
+const btnNameSkip = $('btn-name-skip') as HTMLButtonElement;
+
+// ── Utilities ──────────────────────────────────────
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -73,7 +94,7 @@ function showScreen(screen: HTMLElement) {
 }
 
 function updateStartBtn() {
-  startBtn.disabled = !(selectedDifficulty && selectedCategory && selectedTime);
+  startBtn.disabled = !(selectedCategory && selectedTime);
 }
 
 function formatTime(secs: number): string {
@@ -82,46 +103,99 @@ function formatTime(secs: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-// Difficulty buttons
-document.querySelectorAll<HTMLButtonElement>('#diff-tabs .setup-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('#diff-tabs .setup-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    selectedDifficulty = btn.dataset.diff as Difficulty;
-    updateStartBtn();
-  });
-});
+// ── Leaderboard ────────────────────────────────────
 
-// Category buttons
+async function fetchLeaderboard(category: string, timeMode: number): Promise<LeaderboardEntry[]> {
+  try {
+    const res = await fetch(`/api/codecrack/scores/${category}/${timeMode}`);
+    if (!res.ok) return [];
+    return await res.json() as LeaderboardEntry[];
+  } catch {
+    return [];
+  }
+}
+
+function renderHomeLb(entries: LeaderboardEntry[]) {
+  if (entries.length === 0) {
+    homeLbList.innerHTML = '';
+    homeLbEmpty.textContent = 'No scores yet. Play a round!';
+    homeLbEmpty.classList.remove('hidden');
+    return;
+  }
+  homeLbEmpty.classList.add('hidden');
+  homeLbList.innerHTML = entries
+    .map((e, i) => `<li class="lb-item"><span class="lb-rank">${i + 1}</span><span class="lb-name">${escapeHtml(e.name)}</span><span class="lb-score">${e.score}</span></li>`)
+    .join('');
+}
+
+function renderOverLb(entries: LeaderboardEntry[], highlightName: string) {
+  if (entries.length === 0) {
+    overLbList.innerHTML = '';
+    overLbEmpty.classList.remove('hidden');
+    return;
+  }
+  overLbEmpty.classList.add('hidden');
+  overLbList.innerHTML = entries
+    .map((e, i) => `<li class="lb-item${e.name === highlightName ? ' lb-highlight' : ''}"><span class="lb-rank">${i + 1}</span><span class="lb-name">${escapeHtml(e.name)}</span><span class="lb-score">${e.score}</span></li>`)
+    .join('');
+}
+
+async function refreshHomeLb() {
+  if (!selectedCategory) {
+    homeLbList.innerHTML = '';
+    homeLbEmpty.textContent = 'Pick a category to see scores.';
+    homeLbEmpty.classList.remove('hidden');
+    return;
+  }
+  const entries = await fetchLeaderboard(selectedCategory, activeLbTab);
+  renderHomeLb(entries);
+}
+
+// ── Setup buttons ──────────────────────────────────
+
 document.querySelectorAll<HTMLButtonElement>('#cat-tabs .setup-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('#cat-tabs .setup-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     selectedCategory = btn.dataset.cat as Category;
     updateStartBtn();
+    refreshHomeLb();
   });
 });
 
-// Timer buttons
 document.querySelectorAll<HTMLButtonElement>('#time-tabs .btn-time').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('#time-tabs .btn-time').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     selectedTime = Number(btn.dataset.time) as TimeMode;
+    // Snap the leaderboard tab to match the selected time
+    activeLbTab = selectedTime;
+    document.querySelectorAll<HTMLButtonElement>('.lb-tab').forEach(t => {
+      t.classList.toggle('active', Number(t.dataset.time) === activeLbTab);
+    });
+    refreshHomeLb();
     updateStartBtn();
   });
 });
 
-// Start game
-startBtn.addEventListener('click', () => {
-  if (!selectedDifficulty || !selectedCategory || !selectedTime) return;
+document.querySelectorAll<HTMLButtonElement>('.lb-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.lb-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeLbTab = Number(btn.dataset.time) as TimeMode;
+    refreshHomeLb();
+  });
+});
 
-  pool = shuffle(
-    allQuestions.filter(q => q.difficulty === selectedDifficulty && q.type === selectedCategory)
-  );
+// ── Start game ─────────────────────────────────────
+
+startBtn.addEventListener('click', () => {
+  if (!selectedCategory || !selectedTime) return;
+
+  pool = shuffle(allQuestions.filter(q => q.type === selectedCategory));
 
   if (pool.length === 0) {
-    alert('No questions found for that combination. Try a different selection.');
+    alert('No questions found for that category. Try a different selection.');
     return;
   }
 
@@ -159,23 +233,19 @@ startBtn.addEventListener('click', () => {
   }, 1000);
 });
 
+// ── Question cycling ───────────────────────────────
+
 function pickNext(): Question {
-  // Try unseen questions first
   let unseen = pool.filter((_, i) => !seen.has(i));
 
-  // If all seen, pull in same-difficulty questions from other categories as bonus pool
   if (unseen.length === 0) {
-    const bonus = allQuestions.filter(
-      q => q.difficulty === selectedDifficulty && q.type !== selectedCategory && !pool.includes(q)
-    );
+    const bonus = allQuestions.filter(q => q.type !== selectedCategory && !pool.includes(q));
     if (bonus.length > 0) {
-      const start = pool.length;
       pool.push(...shuffle(bonus));
       unseen = pool.filter((_, i) => !seen.has(i));
     }
   }
 
-  // If still nothing unseen (exhausted everything), reset seen but avoid the last prompt
   if (unseen.length === 0) {
     seen.clear();
     unseen = pool.filter(q => q.prompt !== lastPrompt);
@@ -194,6 +264,9 @@ function loadQuestion() {
   currentQ = q;
   answered = false;
 
+  diffBadge.textContent = DIFF_LABEL[q.difficulty] ?? '';
+  diffBadge.className = `diff-badge ${DIFF_CLASS[q.difficulty] ?? ''}`;
+
   promptText.textContent = q.prompt;
 
   if (q.code) {
@@ -206,11 +279,12 @@ function loadQuestion() {
 
   explanationEl.textContent = '';
   explanationEl.classList.add('hidden');
+  btnSkip.classList.remove('hidden');
 
   const labels = ['A', 'B', 'C', 'D'];
-  optionsGrid.innerHTML = q.options.map((opt, i) =>
-    `<button class="opt-btn" data-idx="${i}"><span class="opt-label">${labels[i]}</span>${escapeHtml(opt)}</button>`
-  ).join('');
+  optionsGrid.innerHTML = q.options
+    .map((opt, i) => `<button class="opt-btn" data-idx="${i}"><span class="opt-label">${labels[i]}</span>${escapeHtml(opt)}</button>`)
+    .join('');
 
   optionsGrid.querySelectorAll<HTMLButtonElement>('.opt-btn').forEach(btn => {
     btn.addEventListener('click', () => selectAnswer(Number(btn.dataset.idx)));
@@ -227,7 +301,7 @@ function selectAnswer(ansIdx: number) {
 
   if (isCorrect) {
     const mult = 1 + Math.floor(streak / 3) * 0.25;
-    score += Math.round((POINTS[q.difficulty] || 100) * mult);
+    score += Math.round((POINTS[q.difficulty] ?? 100) * mult);
     correct++;
     streak++;
     if (streak > bestStreak) bestStreak = streak;
@@ -235,8 +309,7 @@ function selectAnswer(ansIdx: number) {
     streak = 0;
   }
 
-  const btns = optionsGrid.querySelectorAll<HTMLButtonElement>('.opt-btn');
-  btns.forEach((btn, i) => {
+  optionsGrid.querySelectorAll<HTMLButtonElement>('.opt-btn').forEach((btn, i) => {
     btn.disabled = true;
     if (i === q.answer) btn.classList.add('correct');
     if (i === ansIdx && !isCorrect) btn.classList.add('wrong');
@@ -245,6 +318,7 @@ function selectAnswer(ansIdx: number) {
   explanationEl.textContent = q.explanation;
   explanationEl.classList.remove('hidden');
   explanationEl.className = `explanation ${isCorrect ? 'explanation-correct' : 'explanation-wrong'}`;
+  btnSkip.classList.add('hidden');
 
   scoreDisplay.textContent = String(score);
   correctDisplay.textContent = String(correct);
@@ -256,6 +330,24 @@ function selectAnswer(ansIdx: number) {
   }, isCorrect ? 1500 : 2200);
 }
 
+// ── Skip ───────────────────────────────────────────
+
+btnSkip.addEventListener('click', () => {
+  if (answered || timer === null || !currentQ) return;
+  answered = true;
+  total++;
+  streak = 0;
+  scoreDisplay.textContent = String(score);
+  streakDisplay.textContent = String(streak);
+  btnSkip.classList.add('hidden');
+  setTimeout(() => {
+    if (timer === null) return;
+    loadQuestion();
+  }, 300);
+});
+
+// ── End game ───────────────────────────────────────
+
 function endGame() {
   if (timer !== null) {
     clearInterval(timer);
@@ -266,13 +358,89 @@ function endGame() {
   overCorrect.textContent = `${correct}/${total}`;
   overAccuracy.textContent = total > 0 ? `${Math.round((correct / total) * 100)}%` : '0%';
 
+  showNameModal();
+}
+
+// ── Name modal ─────────────────────────────────────
+
+function showNameModal() {
+  inputName.value = '';
+  modalName.classList.remove('hidden');
+  setTimeout(() => inputName.focus(), 50);
+}
+
+function hideNameModal() {
+  modalName.classList.add('hidden');
+}
+
+async function submitAndShowOver(name: string) {
+  hideNameModal();
+
+  if (name && selectedCategory && selectedTime) {
+    try {
+      await fetch('/api/codecrack/scores', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          difficulty: selectedCategory,
+          timeMode: selectedTime,
+          name,
+          score,
+          correct,
+          total,
+          streak: bestStreak,
+          date: new Date().toISOString().slice(0, 10),
+        }),
+      });
+    } catch {
+      // continue even if submission fails
+    }
+  }
+
+  const entries = selectedCategory && selectedTime
+    ? await fetchLeaderboard(selectedCategory, selectedTime)
+    : [];
+
+  if (entries.length > 0) {
+    renderOverLb(entries, name);
+  } else {
+    overLbList.innerHTML = '';
+    overLbEmpty.classList.remove('hidden');
+  }
+
   showScreen(screenOver);
 }
 
-// Play again
-btnPlayAgain.addEventListener('click', () => showScreen(screenHome));
+btnNameConfirm.addEventListener('click', () => {
+  const name = inputName.value.trim().slice(0, 20);
+  if (!name) {
+    inputName.classList.add('input-error');
+    setTimeout(() => inputName.classList.remove('input-error'), 800);
+    return;
+  }
+  submitAndShowOver(name);
+});
 
-// Keyboard shortcuts 1-4
+btnNameSkip.addEventListener('click', () => {
+  submitAndShowOver('');
+});
+
+inputName.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const name = inputName.value.trim().slice(0, 20);
+    if (name) submitAndShowOver(name);
+  }
+});
+
+// ── Play again ─────────────────────────────────────
+
+btnPlayAgain.addEventListener('click', () => {
+  showScreen(screenHome);
+  refreshHomeLb();
+});
+
+// ── Keyboard shortcuts 1–4 ─────────────────────────
+
 document.addEventListener('keydown', (e) => {
   if (screenGame.classList.contains('hidden') || answered) return;
   const key = parseInt(e.key);
@@ -282,7 +450,8 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// Theme toggle
+// ── Theme toggle ───────────────────────────────────
+
 const THEME_KEY = 'codecrack.theme';
 const themeToggle = $('theme-toggle');
 const themeIcon = $('theme-icon');
@@ -300,8 +469,12 @@ themeToggle.addEventListener('click', () => {
   applyTheme(!document.body.classList.contains('theme-light'));
 });
 
-// Load questions
+// ── Load questions ─────────────────────────────────
+
 fetch('data/questions.json')
   .then(r => r.json())
-  .then((data: Question[]) => { allQuestions = data; })
+  .then((data: Question[]) => {
+    allQuestions = data;
+    refreshHomeLb();
+  })
   .catch(err => console.error('Failed to load questions:', err));
