@@ -22,7 +22,7 @@
   <span class="floater" style="left:55%;animation-duration:26s;animation-delay:5s;font-size:1.3rem">&lt;/&gt;</span>
   <span class="floater" style="left:68%;animation-duration:19s;animation-delay:9s;font-size:1.8rem">( )</span>
   <span class="floater" style="left:80%;animation-duration:21s;animation-delay:2s;font-size:1.1rem">=&gt;</span>
-  <span class="floater" style="left:92%;animation-duration:23s;animation-delay:6s;font-size:1.5rem">&&</span>
+  <span class="floater" style="left:92%;animation-duration:23s;animation-delay:6s;font-size:1.5rem">&amp;&amp;</span>
 </div>
 
 <a href="/" class="back-home">&larr; Home</a>
@@ -39,15 +39,6 @@
     <p class="subtitle">Test your coding knowledge against the clock</p>
 
     <div class="setup-section">
-      <p class="section-label">Difficulty</p>
-      <div class="setup-buttons" id="diff-tabs">
-        <button class="btn setup-btn" data-diff="easy">Easy</button>
-        <button class="btn setup-btn" data-diff="medium">Medium</button>
-        <button class="btn setup-btn" data-diff="hard">Hard</button>
-      </div>
-    </div>
-
-    <div class="setup-section">
       <p class="section-label">Category</p>
       <div class="setup-buttons" id="cat-tabs">
         <button class="btn setup-btn" data-cat="bigO">Big O</button>
@@ -59,19 +50,29 @@
     <div class="setup-section">
       <p class="section-label">Timer</p>
       <div class="time-buttons" id="time-tabs">
+        <button class="btn btn-time" data-time="60">
+          <span class="time-val">1:00</span>
+          <span class="time-label">Sprint</span>
+        </button>
         <button class="btn btn-time" data-time="120">
           <span class="time-val">2:00</span>
-          <span class="time-label">Sprint</span>
+          <span class="time-label">Flow</span>
         </button>
         <button class="btn btn-time" data-time="180">
           <span class="time-val">3:00</span>
-          <span class="time-label">Flow</span>
-        </button>
-        <button class="btn btn-time" data-time="300">
-          <span class="time-val">5:00</span>
           <span class="time-label">Marathon</span>
         </button>
       </div>
+    </div>
+
+    <div class="lb-section">
+      <div class="lb-tabs">
+        <button class="lb-tab active" data-time="60">1 min</button>
+        <button class="lb-tab" data-time="120">2 min</button>
+        <button class="lb-tab" data-time="180">3 min</button>
+      </div>
+      <ol id="home-lb-list" class="lb-list"></ol>
+      <p id="home-lb-empty" class="lb-empty">Pick a category to see scores.</p>
     </div>
 
     <button id="start-btn" class="btn btn-primary" disabled>Start Cracking</button>
@@ -101,10 +102,16 @@
     </div>
     <span id="timer-display" class="countdown-text">0:00</span>
 
+    <div class="question-meta">
+      <span id="diff-badge" class="diff-badge"></span>
+    </div>
+
     <p id="prompt-text" class="prompt-text"></p>
     <pre id="code-block" class="code-block hidden"></pre>
     <div id="options-grid" class="options-grid"></div>
     <p id="explanation" class="explanation hidden"></p>
+
+    <button id="btn-skip" class="btn btn-skip hidden">Skip &rarr;</button>
   </div>
 </div>
 
@@ -129,7 +136,24 @@
       </div>
     </div>
 
+    <div class="lb-section lb-section-over">
+      <h3 class="lb-heading">Leaderboard</h3>
+      <ol id="over-lb-list" class="lb-list"></ol>
+      <p id="over-lb-empty" class="lb-empty hidden">No scores yet.</p>
+    </div>
+
     <button id="btn-play-again" class="btn btn-primary">Play Again</button>
+  </div>
+</div>
+
+<!-- Name Modal -->
+<div id="modal-name" class="modal-overlay hidden">
+  <div class="card modal-card">
+    <h2 class="modal-title">Time's Up!</h2>
+    <p class="modal-subtitle">Enter your name for the leaderboard</p>
+    <input id="input-name" type="text" class="game-input" placeholder="Your name" maxlength="20" autocomplete="off" />
+    <button id="btn-name-confirm" class="btn btn-primary">Submit Score</button>
+    <button id="btn-name-skip" class="btn btn-secondary">Skip</button>
   </div>
 </div>
 
