@@ -18,13 +18,13 @@ import posthog from '../../posthog';
 
 interface Player {
   id: string; // socket.id
-  playerId: string; // ⭐ persistent identity (NEW)
+  playerId: string; // persistent identity
   name: string;
   score: number;
   vote: string | null;
   isImposter: boolean;
   color: PlayerColor;
-  disconnectedAt?: number; // ⭐ NEW
+  disconnectedAt?: number;
 }
 
 interface Room {
@@ -57,7 +57,7 @@ type GameSocket = Socket<
 const EVENT_WINDOW_MS = 1000;
 const EVENT_LIMIT_PER_WINDOW = 15;
 
-// ⭐ NEW: disconnect grace period
+// ⭐ IMPORTANT: iOS disconnect buffer
 const DISCONNECT_GRACE_MS = 2 * 60 * 1000; // 2 minutes
 
 export function setupImposter(rawNs: Namespace): void {
@@ -85,6 +85,12 @@ export function setupImposter(rawNs: Namespace): void {
     room.lastActivityAt = Date.now();
   }
 
+  function normalizeSettings(input?: Partial<RoomSettings>): RoomSettings {
+    return {
+      numImposters: Math.max(1, Math.min(3, Number(input?.numImposters) || 1)),
+    };
+  }
+
   function checkEventRate(socket: GameSocket): boolean {
     const now = Date.now();
     const stamps = socket.data.eventTimestamps ?? [];
@@ -103,7 +109,54 @@ export function setupImposter(rawNs: Namespace): void {
     socket.data.eventTimestamps = [];
 
     // =========================
-    // JOIN / RECONNECT SUPPORT
+    // CREATE ROOM
+    // =========================
+    socket.on('create-room', ({ playerName, settings }) => {
+      if (!checkEventRate(socket)) return;
+
+      const code = Math.random().toString(36).substring(2, 7).toUpperCase();
+
+      const room: Room = {
+        code,
+        hostId: socket.id,
+        players: [
+          {
+            id: socket.id,
+            playerId: crypto.randomUUID(), // ⭐ stable identity
+            name: playerName,
+            score: 0,
+            vote: null,
+            isImposter: false,
+            color: PLAYER_COLOR_PALETTE[0]!,
+          },
+        ],
+        state: 'lobby',
+        round: 0,
+        word: null,
+        hint: null,
+        imposterId: null,
+        imposterIds: [],
+        settings: normalizeSettings(settings),
+        lastCaught: false,
+        lastActivityAt: Date.now(),
+      };
+
+      rooms.set(code, room);
+      socket.join(code);
+      socket.data.roomCode = code;
+
+      socket.emit('joined', {
+        code,
+        myId: socket.id,
+        players: room.players.map(safePlayer),
+        hostId: room.hostId,
+        state: 'lobby',
+        settings: room.settings,
+      });
+    });
+
+    // =========================
+    // JOIN + RECONNECT
     // =========================
     socket.on('join-room', ({ code, playerName, playerId }: any) => {
       if (!checkEventRate(socket)) return;
@@ -114,7 +167,7 @@ export function setupImposter(rawNs: Namespace): void {
         return;
       }
 
-      // ⭐ RECONNECT LOGIC
+      // ⭐ RECONNECT
       const existing = room.players.find((p) => p.playerId === playerId);
 
       if (existing) {
@@ -174,15 +227,10 @@ export function setupImposter(rawNs: Namespace): void {
       });
 
       touch(room);
-
-      socket.to(code).emit('player-joined', {
-        players: room.players.map(safePlayer),
-        hostId: room.hostId,
-      });
     });
 
     // =========================
-    // DISCONNECT HANDLING (FIXED)
+    // DISCONNECT (FIXED)
     // =========================
     socket.on('disconnect', () => {
       const code = socket.data.roomCode;
@@ -224,58 +272,6 @@ export function setupImposter(rawNs: Namespace): void {
           });
         }
       }, DISCONNECT_GRACE_MS);
-    });
-
-    // =========================
-    // (ALL YOUR EXISTING GAME LOGIC UNCHANGED BELOW)
-    // =========================
-
-    // IMPORTANT:
-    // Your create-room, start-game, voting, etc remain unchanged
-    // because this fix only affects session stability
-
-    socket.on('create-room', ({ playerName, settings }) => {
-      if (!checkEventRate(socket)) return;
-
-      const code = Math.random().toString(36).substring(2, 7).toUpperCase();
-
-      const room: Room = {
-        code,
-        hostId: socket.id,
-        players: [
-          {
-            id: socket.id,
-            playerId: 'host',
-            name: playerName,
-            score: 0,
-            vote: null,
-            isImposter: false,
-            color: PLAYER_COLOR_PALETTE[0]!,
-          },
-        ],
-        state: 'lobby',
-        round: 0,
-        word: null,
-        hint: null,
-        imposterId: null,
-        imposterIds: [],
-        settings,
-        lastCaught: false,
-        lastActivityAt: Date.now(),
-      };
-
-      rooms.set(code, room);
-      socket.join(code);
-      socket.data.roomCode = code;
-
-      socket.emit('joined', {
-        code,
-        myId: socket.id,
-        players: room.players.map(safePlayer),
-        hostId: room.hostId,
-        state: 'lobby',
-        settings: room.settings,
-      });
     });
   });
 }
