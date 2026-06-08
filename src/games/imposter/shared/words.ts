@@ -1,3 +1,5 @@
+import { INDIAN_WORD_LIST } from './words.in';
+
 export interface WordEntry {
   word: string;
   hint: string;
@@ -359,3 +361,15 @@ export const WORD_LIST: WordEntry[] = [
   ...toEntries(videoGames, 'Video Game'),
   ...toEntries(books, 'Book'),
 ];
+
+export type WordMode = 'global' | 'india';
+
+export function getWordList(mode: WordMode): WordEntry[] {
+  switch (mode) {
+    case 'india':
+      return INDIAN_WORD_LIST;
+    case 'global':
+    default:
+      return WORD_LIST;
+  }
+}

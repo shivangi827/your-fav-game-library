@@ -1,316 +1,188 @@
-import { Namespace, Socket } from 'socket.io';
+import { Server, Socket, Namespace } from 'socket.io';
 import {
   ClientToServerEvents,
   ServerToClientEvents,
   PublicPlayer,
-  PlayerColor,
-  PLAYER_COLOR_PALETTE,
   RoomSettings,
   GameStateName,
-  MAX_PLAYERS_PER_ROOM,
-  MIN_PLAYERS_TO_START,
-  MAX_NAME_LENGTH,
-  MAX_GUESS_LENGTH,
-  MAX_ROOMS,
+  PlayerColor,
 } from './shared/types';
 
-import { WORD_LIST } from './shared/words';
-import posthog from '../../posthog';
-
-interface Player {
-  id: string; // socket.id
-  playerId: string;
-  name: string;
-  score: number;
-  vote: string | null;
-  isImposter: boolean;
-  color: PlayerColor;
-  disconnectedAt?: number;
-}
+import { getWordList, WordMode, WordEntry } from './shared/words';
 
 interface Room {
   code: string;
   hostId: string;
-  players: Player[];
+  players: Map<string, PublicPlayer & { socketId: string }>;
+  settings: RoomSettings & { wordMode: WordMode };
   state: GameStateName;
-  round: number;
-  word: string | null;
-  hint: string | null;
-  imposterId: string | null;
-  imposterIds: string[];
-  settings: RoomSettings;
-  lastCaught: boolean;
-  lastActivityAt: number;
+  word: string;
+  hint: string;
 }
 
-interface SocketData {
-  roomCode?: string;
-  eventTimestamps: number[];
+const rooms = new Map<string, Room>();
+
+const COLORS: PlayerColor[] = [
+  'blue',
+  'red',
+  'orange',
+  'purple',
+  'pink',
+  'green',
+  'yellow',
+  'teal',
+];
+
+function createRoomCode(): string {
+  return Math.random().toString(36).substring(2, 7).toUpperCase();
 }
 
-type GameSocket = Socket<
-  ClientToServerEvents,
-  ServerToClientEvents,
-  Record<string, never>,
-  SocketData
->;
+function pickWord(mode: WordMode): WordEntry {
+  const list = getWordList(mode);
+  return list[Math.floor(Math.random() * list.length)];
+}
 
-const EVENT_WINDOW_MS = 1000;
-const EVENT_LIMIT_PER_WINDOW = 15;
-const DISCONNECT_GRACE_MS = 2 * 60 * 1000;
+export function setupImposter(
+  io: Server<ClientToServerEvents, ServerToClientEvents>
+) {
+  const namespace: Namespace<ClientToServerEvents, ServerToClientEvents> =
+    io.of('/imposter');
 
-export function setupImposter(rawNs: Namespace): void {
-  const ns = rawNs as Namespace<
-    ClientToServerEvents,
-    ServerToClientEvents,
-    Record<string, never>,
-    SocketData
-  >;
+  namespace.on('connection', (socket: Socket) => {
+    let roomCode: string | null = null;
 
-  const rooms = new Map<string, Room>();
-
-  function safePlayer(p: Player): PublicPlayer {
-    return { id: p.id, name: p.name, score: p.score, color: p.color };
-  }
-
-  function touch(room: Room) {
-    room.lastActivityAt = Date.now();
-  }
-
-  function normalizeSettings(input?: Partial<RoomSettings>): RoomSettings {
-    return {
-      numImposters: Math.max(1, Math.min(3, Number(input?.numImposters) || 1)),
-    };
-  }
-
-  function emitRoomState(room: Room) {
-    ns.to(room.code).emit('game-state', {
-      state: room.state,
-      round: room.round,
-      hostId: room.hostId,
-      players: room.players.map(safePlayer),
-      settings: room.settings,
-    });
-  }
-
-  function checkRate(socket: GameSocket) {
-    const now = Date.now();
-    const arr = socket.data.eventTimestamps ?? [];
-    const recent = arr.filter((t) => now - t < EVENT_WINDOW_MS);
-    recent.push(now);
-    socket.data.eventTimestamps = recent;
-
-    if (recent.length > EVENT_LIMIT_PER_WINDOW) {
-      socket.emit('error-msg', { message: 'Slow down.' });
-      return false;
-    }
-    return true;
-  }
-
-  ns.on('connection', (socket: GameSocket) => {
-    socket.data.eventTimestamps = [];
-
-    // =========================
-    // CREATE ROOM
-    // =========================
+    /* ---------------- CREATE ROOM ---------------- */
     socket.on('create-room', ({ playerName, settings }) => {
-      if (!checkRate(socket)) return;
-
-      const code = Math.random().toString(36).substring(2, 7).toUpperCase();
+      const code = createRoomCode();
 
       const room: Room = {
         code,
         hostId: socket.id,
-        players: [
-          {
-            id: socket.id,
-            playerId: crypto.randomUUID(),
-            name: playerName,
-            score: 0,
-            vote: null,
-            isImposter: false,
-            color: PLAYER_COLOR_PALETTE[0]!,
-          },
-        ],
+        players: new Map(),
+        settings: {
+          numImposters: settings?.numImposters ?? 1,
+          wordMode: settings?.wordMode ?? 'global',
+        },
         state: 'lobby',
-        round: 0,
-        word: null,
-        hint: null,
-        imposterId: null,
-        imposterIds: [],
-        settings: normalizeSettings(settings),
-        lastCaught: false,
-        lastActivityAt: Date.now(),
+        word: '',
+        hint: '',
       };
 
+      const player: PublicPlayer & { socketId: string } = {
+        id: socket.id,
+        socketId: socket.id,
+        name: playerName,
+        score: 0,
+        color: COLORS[0],
+      };
+
+      room.players.set(socket.id, player);
       rooms.set(code, room);
+
+      roomCode = code;
       socket.join(code);
-      socket.data.roomCode = code;
 
       socket.emit('joined', {
         code,
         myId: socket.id,
-        players: room.players.map(safePlayer),
+        players: [...room.players.values()],
         hostId: room.hostId,
         state: room.state,
         settings: room.settings,
       });
-
-      emitRoomState(room);
     });
 
-    // =========================
-    // JOIN / RECONNECT
-    // =========================
-    socket.on('join-room', ({ code, playerName, playerId }: any) => {
-      if (!checkRate(socket)) return;
-
+    /* ---------------- JOIN ROOM ---------------- */
+    socket.on('join-room', ({ code, playerName }) => {
       const room = rooms.get(code);
-      if (!room) {
-        socket.emit('error-msg', { message: 'Room not found.' });
-        return;
-      }
+      if (!room) return;
 
-      // RECONNECT
-      const existing = room.players.find((p) => p.playerId === playerId);
-
-      if (existing) {
-        existing.id = socket.id;
-        existing.disconnectedAt = undefined;
-
-        socket.join(code);
-        socket.data.roomCode = code;
-
-        socket.emit('joined', {
-          code,
-          myId: socket.id,
-          players: room.players.map(safePlayer),
-          hostId: room.hostId,
-          state: room.state,
-          settings: room.settings,
-        });
-
-        emitRoomState(room);
-        return;
-      }
-
-      // NEW PLAYER
-      if (room.state !== 'lobby') {
-        socket.emit('error-msg', { message: 'Game in progress.' });
-        return;
-      }
-
-      if (room.players.length >= MAX_PLAYERS_PER_ROOM) {
-        socket.emit('error-msg', { message: 'Room full.' });
-        return;
-      }
-
-      room.players.push({
+      const player: PublicPlayer & { socketId: string } = {
         id: socket.id,
-        playerId,
+        socketId: socket.id,
         name: playerName,
         score: 0,
-        vote: null,
-        isImposter: false,
-        color: PLAYER_COLOR_PALETTE[0]!,
+        color: COLORS[room.players.size % COLORS.length],
+      };
+
+      room.players.set(socket.id, player);
+
+      roomCode = code;
+      socket.join(code);
+
+      namespace.to(code).emit('player-joined', {
+        players: [...room.players.values()],
+        hostId: room.hostId,
+      });
+    });
+
+    /* ---------------- SETTINGS ---------------- */
+    socket.on('update-settings', (newSettings) => {
+      if (!roomCode) return;
+
+      const room = rooms.get(roomCode);
+      if (!room) return;
+
+      room.settings = {
+        ...room.settings,
+        ...newSettings,
+      };
+
+      namespace.to(roomCode).emit('settings-updated', {
+        settings: room.settings,
+      });
+    });
+
+    /* ---------------- START GAME ---------------- */
+    socket.on('start-game', () => {
+      if (!roomCode) return;
+
+      const room = rooms.get(roomCode);
+      if (!room) return;
+
+      const wordEntry = pickWord(room.settings.wordMode);
+
+      room.word = wordEntry.word;
+      room.hint = wordEntry.hint;
+      room.state = 'role_reveal';
+
+      namespace.to(roomCode).emit('game-state', {
+        state: room.state,
+        hostId: room.hostId,
+        players: [...room.players.values()],
       });
 
-      socket.join(code);
-      socket.data.roomCode = code;
+      /* ---------------- ROLE DISTRIBUTION (FIXED UNION TYPE) ---------------- */
+      room.players.forEach((player) => {
+        const isImposter = player.id === socket.id;
 
-      emitRoomState(room);
-    });
-
-    // =========================
-    // DISCONNECT (GRACEFUL)
-    // =========================
-    socket.on('disconnect', () => {
-      const code = socket.data.roomCode;
-      if (!code) return;
-
-      const room = rooms.get(code);
-      if (!room) return;
-
-      const player = room.players.find((p) => p.id === socket.id);
-      if (!player) return;
-
-      player.disconnectedAt = Date.now();
-
-      setTimeout(() => {
-        const room = rooms.get(code);
-        if (!room) return;
-
-        const still = room.players.find((p) => p.id === socket.id);
-        if (!still) return;
-
-        if (
-          still.disconnectedAt &&
-          Date.now() - still.disconnectedAt > DISCONNECT_GRACE_MS
-        ) {
-          room.players = room.players.filter((p) => p.id !== socket.id);
-
-          if (room.players.length === 0) {
-            rooms.delete(code);
-            return;
-          }
-
-          if (room.hostId === socket.id) {
-            room.hostId = room.players[0]!.id;
-          }
-
-          emitRoomState(room);
+        if (isImposter) {
+          namespace.to(player.socketId).emit('your-role', {
+            role: 'imposter',
+            hint: room.hint,
+          });
+        } else {
+          namespace.to(player.socketId).emit('your-role', {
+            role: 'civilian',
+            word: room.word,
+          });
         }
-      }, DISCONNECT_GRACE_MS);
+      });
     });
 
-    // =========================
-    // GAME ACTIONS (ALL SNAPSHOT BASED)
-    // =========================
+    /* ---------------- DISCONNECT ---------------- */
+    socket.on('disconnect', () => {
+      if (!roomCode) return;
 
-    socket.on('start-game', () => {
-      const code = socket.data.roomCode;
-      if (!code) return;
-
-      const room = rooms.get(code);
-      if (!room || room.hostId !== socket.id) return;
-
-      room.state = 'role_reveal';
-      room.round = 0;
-
-      emitRoomState(room);
-    });
-
-    socket.on('next-round', () => {
-      const room = rooms.get(socket.data.roomCode!);
-      if (!room || room.hostId !== socket.id) return;
-
-      room.round++;
-      room.state = room.round > 3 ? 'voting' : 'round';
-
-      emitRoomState(room);
-    });
-
-    socket.on('submit-vote', ({ votedId }) => {
-      const room = rooms.get(socket.data.roomCode!);
+      const room = rooms.get(roomCode);
       if (!room) return;
 
-      const player = room.players.find((p) => p.id === socket.id);
-      if (!player) return;
+      room.players.delete(socket.id);
 
-      player.vote = votedId;
-
-      emitRoomState(room);
-    });
-
-    socket.on('play-again', () => {
-      const room = rooms.get(socket.data.roomCode!);
-      if (!room || room.hostId !== socket.id) return;
-
-      room.state = 'lobby';
-      room.round = 0;
-      room.players.forEach((p) => (p.vote = null));
-
-      emitRoomState(room);
+      namespace.to(roomCode).emit('player-left', {
+        players: [...room.players.values()],
+        hostId: room.hostId,
+      });
     });
   });
 }

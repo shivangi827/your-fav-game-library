@@ -37,6 +37,7 @@ export interface PublicPlayer {
 
 export interface RoomSettings {
   numImposters: number;
+  wordMode?: 'global' | 'india';
 }
 
 export interface VoteRecord {
