@@ -13,12 +13,13 @@ import {
   MAX_GUESS_LENGTH,
   MAX_ROOMS,
 } from './shared/types';
+
 import { WORD_LIST } from './shared/words';
 import posthog from '../../posthog';
 
 interface Player {
   id: string; // socket.id
-  playerId: string; // persistent identity
+  playerId: string;
   name: string;
   score: number;
   vote: string | null;
@@ -56,9 +57,7 @@ type GameSocket = Socket<
 
 const EVENT_WINDOW_MS = 1000;
 const EVENT_LIMIT_PER_WINDOW = 15;
-
-// ⭐ IMPORTANT: iOS disconnect buffer
-const DISCONNECT_GRACE_MS = 2 * 60 * 1000; // 2 minutes
+const DISCONNECT_GRACE_MS = 2 * 60 * 1000;
 
 export function setupImposter(rawNs: Namespace): void {
   const ns = rawNs as Namespace<
@@ -74,14 +73,7 @@ export function setupImposter(rawNs: Namespace): void {
     return { id: p.id, name: p.name, score: p.score, color: p.color };
   }
 
-  function pickColor(taken: Set<PlayerColor>): PlayerColor {
-    for (const c of PLAYER_COLOR_PALETTE) {
-      if (!taken.has(c)) return c;
-    }
-    return PLAYER_COLOR_PALETTE[0]!;
-  }
-
-  function touch(room: Room): void {
+  function touch(room: Room) {
     room.lastActivityAt = Date.now();
   }
 
@@ -91,10 +83,20 @@ export function setupImposter(rawNs: Namespace): void {
     };
   }
 
-  function checkEventRate(socket: GameSocket): boolean {
+  function emitRoomState(room: Room) {
+    ns.to(room.code).emit('game-state', {
+      state: room.state,
+      round: room.round,
+      hostId: room.hostId,
+      players: room.players.map(safePlayer),
+      settings: room.settings,
+    });
+  }
+
+  function checkRate(socket: GameSocket) {
     const now = Date.now();
-    const stamps = socket.data.eventTimestamps ?? [];
-    const recent = stamps.filter((t) => now - t < EVENT_WINDOW_MS);
+    const arr = socket.data.eventTimestamps ?? [];
+    const recent = arr.filter((t) => now - t < EVENT_WINDOW_MS);
     recent.push(now);
     socket.data.eventTimestamps = recent;
 
@@ -112,7 +114,7 @@ export function setupImposter(rawNs: Namespace): void {
     // CREATE ROOM
     // =========================
     socket.on('create-room', ({ playerName, settings }) => {
-      if (!checkEventRate(socket)) return;
+      if (!checkRate(socket)) return;
 
       const code = Math.random().toString(36).substring(2, 7).toUpperCase();
 
@@ -122,7 +124,7 @@ export function setupImposter(rawNs: Namespace): void {
         players: [
           {
             id: socket.id,
-            playerId: crypto.randomUUID(), // ⭐ stable identity
+            playerId: crypto.randomUUID(),
             name: playerName,
             score: 0,
             vote: null,
@@ -150,16 +152,18 @@ export function setupImposter(rawNs: Namespace): void {
         myId: socket.id,
         players: room.players.map(safePlayer),
         hostId: room.hostId,
-        state: 'lobby',
+        state: room.state,
         settings: room.settings,
       });
+
+      emitRoomState(room);
     });
 
     // =========================
-    // JOIN + RECONNECT
+    // JOIN / RECONNECT
     // =========================
     socket.on('join-room', ({ code, playerName, playerId }: any) => {
-      if (!checkEventRate(socket)) return;
+      if (!checkRate(socket)) return;
 
       const room = rooms.get(code);
       if (!room) {
@@ -167,7 +171,7 @@ export function setupImposter(rawNs: Namespace): void {
         return;
       }
 
-      // ⭐ RECONNECT
+      // RECONNECT
       const existing = room.players.find((p) => p.playerId === playerId);
 
       if (existing) {
@@ -186,23 +190,20 @@ export function setupImposter(rawNs: Namespace): void {
           settings: room.settings,
         });
 
-        touch(room);
+        emitRoomState(room);
         return;
       }
 
       // NEW PLAYER
       if (room.state !== 'lobby') {
-        socket.emit('error-msg', { message: 'Game already in progress.' });
+        socket.emit('error-msg', { message: 'Game in progress.' });
         return;
       }
 
       if (room.players.length >= MAX_PLAYERS_PER_ROOM) {
-        socket.emit('error-msg', { message: 'Room is full.' });
+        socket.emit('error-msg', { message: 'Room full.' });
         return;
       }
-
-      const taken = new Set(room.players.map((p) => p.color));
-      const color = pickColor(taken);
 
       room.players.push({
         id: socket.id,
@@ -211,26 +212,17 @@ export function setupImposter(rawNs: Namespace): void {
         score: 0,
         vote: null,
         isImposter: false,
-        color,
+        color: PLAYER_COLOR_PALETTE[0]!,
       });
 
       socket.join(code);
       socket.data.roomCode = code;
 
-      socket.emit('joined', {
-        code,
-        myId: socket.id,
-        players: room.players.map(safePlayer),
-        hostId: room.hostId,
-        state: 'lobby',
-        settings: room.settings,
-      });
-
-      touch(room);
+      emitRoomState(room);
     });
 
     // =========================
-    // DISCONNECT (FIXED)
+    // DISCONNECT (GRACEFUL)
     // =========================
     socket.on('disconnect', () => {
       const code = socket.data.roomCode;
@@ -253,7 +245,7 @@ export function setupImposter(rawNs: Namespace): void {
 
         if (
           still.disconnectedAt &&
-          Date.now() - still.disconnectedAt >= DISCONNECT_GRACE_MS
+          Date.now() - still.disconnectedAt > DISCONNECT_GRACE_MS
         ) {
           room.players = room.players.filter((p) => p.id !== socket.id);
 
@@ -266,12 +258,59 @@ export function setupImposter(rawNs: Namespace): void {
             room.hostId = room.players[0]!.id;
           }
 
-          ns.to(code).emit('player-left', {
-            players: room.players.map(safePlayer),
-            hostId: room.hostId,
-          });
+          emitRoomState(room);
         }
       }, DISCONNECT_GRACE_MS);
+    });
+
+    // =========================
+    // GAME ACTIONS (ALL SNAPSHOT BASED)
+    // =========================
+
+    socket.on('start-game', () => {
+      const code = socket.data.roomCode;
+      if (!code) return;
+
+      const room = rooms.get(code);
+      if (!room || room.hostId !== socket.id) return;
+
+      room.state = 'role_reveal';
+      room.round = 0;
+
+      emitRoomState(room);
+    });
+
+    socket.on('next-round', () => {
+      const room = rooms.get(socket.data.roomCode!);
+      if (!room || room.hostId !== socket.id) return;
+
+      room.round++;
+      room.state = room.round > 3 ? 'voting' : 'round';
+
+      emitRoomState(room);
+    });
+
+    socket.on('submit-vote', ({ votedId }) => {
+      const room = rooms.get(socket.data.roomCode!);
+      if (!room) return;
+
+      const player = room.players.find((p) => p.id === socket.id);
+      if (!player) return;
+
+      player.vote = votedId;
+
+      emitRoomState(room);
+    });
+
+    socket.on('play-again', () => {
+      const room = rooms.get(socket.data.roomCode!);
+      if (!room || room.hostId !== socket.id) return;
+
+      room.state = 'lobby';
+      room.round = 0;
+      room.players.forEach((p) => (p.vote = null));
+
+      emitRoomState(room);
     });
   });
 }
