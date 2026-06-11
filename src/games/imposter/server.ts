@@ -110,7 +110,16 @@ export function setupImposter(
       roomCode = code;
       socket.join(code);
 
-      namespace.to(code).emit('player-joined', {
+      socket.emit('joined', {
+        code,
+        myId: socket.id,
+        players: [...room.players.values()],
+        hostId: room.hostId,
+        state: room.state,
+        settings: room.settings,
+      });
+
+      namespace.to(code).except(socket.id).emit('player-joined', {
         players: [...room.players.values()],
         hostId: room.hostId,
       });
