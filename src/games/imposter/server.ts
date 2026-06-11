@@ -602,7 +602,7 @@ export function setupImposter(io: Server): void {
         const currentRoom = rooms.get(code);
         if (!currentRoom) return;
         removePlayerFromRoom(currentRoom, player.persistentId);
-      }, 60_000);
+      }, 360_000);
 
       disconnectTimers.set(player.persistentId, timer);
     });
