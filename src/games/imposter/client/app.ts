@@ -8,8 +8,24 @@ import type {
   VoteRecord,
 } from '../shared/types';
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> =
-  io('/imposter');
+function getOrCreatePersistentId(): string {
+  const key = 'imposter-persistent-id';
+  let id = sessionStorage.getItem(key);
+  if (!id) {
+    id = typeof crypto.randomUUID === 'function'
+      ? crypto.randomUUID()
+      : Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+    sessionStorage.setItem(key, id);
+  }
+  return id;
+}
+
+const persistentId = getOrCreatePersistentId();
+const savedRoomCode = sessionStorage.getItem('imposter-room-code');
+
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io('/imposter', {
+  auth: { persistentId, roomCode: savedRoomCode ?? undefined },
+});
 
 interface ClientState {
   myId: string | null;
@@ -344,6 +360,8 @@ socket.on('joined', (data) => {
   state.players = data.players;
   state.settings = data.settings || { numImposters: 1, wordMode: 'global' };
 
+  sessionStorage.setItem('imposter-room-code', data.code);
+
   hideModal('modal-name');
   showScreen('lobby');
   renderLobby();
@@ -475,6 +493,7 @@ $('setting-word-mode').addEventListener('change', (e) => {
 /* ---------------- CREATE / JOIN ---------------- */
 
 $('btn-create').addEventListener('click', () => {
+  sessionStorage.removeItem('imposter-room-code');
   state.pendingAction = 'create';
   $('modal-name-title').textContent = 'Enter Your Name';
   ($('input-name') as HTMLInputElement).value = '';
@@ -557,10 +576,7 @@ $('btn-copy-link').addEventListener('click', () => {
 
 $('setting-imposters').addEventListener('change', (e) => {
   const target = e.target as HTMLSelectElement;
-  socket.emit('update-settings', {
-    numImposters: parseInt(target.value, 10),
-    wordMode: state.settings.wordMode,
-  });
+  socket.emit('update-settings', { numImposters: parseInt(target.value, 10) });
 });
 
 $('btn-start-game').addEventListener('click', () => {
